@@ -63,13 +63,13 @@ const HOW_IT_WORKS = [
 
 const PRICING = [
   {
-    name: "Starter",
-    price: "$499",
+    name: "Free",
+    price: "$0",
     period: "/month",
-    description: "For teams evaluating their first AI agent.",
+    description: "Try Stabilium with no commitment.",
     features: [
-      "Up to 1,000 evaluations / month",
-      "3 models",
+      "25 evaluations / month",
+      "1 model",
       "Standard benchmark suite",
       "ASI score + domain breakdown",
       "CSV export",
@@ -78,13 +78,13 @@ const PRICING = [
     highlight: false,
   },
   {
-    name: "Growth",
-    price: "$1,999",
+    name: "Pro",
+    price: "$25",
     period: "/month",
     description: "For teams shipping AI agents to production.",
     features: [
       "Unlimited evaluations",
-      "10 models",
+      "5 models",
       "Custom benchmark cases",
       "Compliance PDF reports",
       "GitHub Action integration",
@@ -99,7 +99,7 @@ const PRICING = [
     period: "",
     description: "For organizations with compliance requirements.",
     features: [
-      "Everything in Growth",
+      "Everything in Pro",
       "REST API access",
       "SSO / SAML",
       "Audit log export",
