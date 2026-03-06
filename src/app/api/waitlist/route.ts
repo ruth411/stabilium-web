@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const NOTIFY_EMAIL = "ruthwikdov@gmail.com";
 
 export async function POST(req: NextRequest) {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    return NextResponse.json({ error: "RESEND_API_KEY is not configured" }, { status: 503 });
+  }
+  const resend = new Resend(resendApiKey);
+
   const { email } = await req.json();
   if (!email || typeof email !== "string" || !email.includes("@")) {
     return NextResponse.json({ error: "Invalid email" }, { status: 400 });
