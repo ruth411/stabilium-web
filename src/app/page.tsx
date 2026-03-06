@@ -181,6 +181,7 @@ export default function HomePage() {
   const [provider, setProvider] = useState<"openai" | "anthropic">("openai");
   const [model, setModel] = useState("gpt-4o-mini");
   const [apiKey, setApiKey] = useState("");
+  const [maxCases, setMaxCases] = useState(5);
   const [evalStatus, setEvalStatus] = useState<"idle" | "loading" | "error" | "done">("idle");
   const [result, setResult] = useState<EvalResult | null>(null);
   const [evalError, setEvalError] = useState<string | null>(null);
@@ -196,7 +197,7 @@ export default function HomePage() {
       const res = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: 3, max_cases: 10 }),
+        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: 3, max_cases: maxCases }),
       });
       const data = (await res.json()) as EvalResult | { error?: string };
       if (!res.ok) {
@@ -470,6 +471,30 @@ export default function HomePage() {
                   required
                 />
               </label>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium" style={{ color: "#8b9ab0" }}>
+                    Number of cases
+                  </span>
+                  <span className="mono font-bold" style={{ color: "#00d68f" }}>
+                    {maxCases}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={10}
+                  value={maxCases}
+                  onChange={(e) => setMaxCases(Number(e.target.value))}
+                  className="w-full cursor-pointer accent-[#00d68f]"
+                />
+                <div className="flex justify-between text-xs" style={{ color: "#8b9ab0" }}>
+                  <span>1</span>
+                  <span>5</span>
+                  <span>10 (max free)</span>
+                </div>
+              </div>
 
               <button
                 type="submit"
