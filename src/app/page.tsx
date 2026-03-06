@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type EvalResult = {
+  model: string;
+  provider: string;
+  asi: number;
+  domain_scores: Record<string, number>;
+  num_cases: number;
+  run_count: number;
+};
+
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const BENCHMARK_RESULTS = [
@@ -277,6 +288,194 @@ function WaitlistForm({ label = "Join the waitlist" }: { label?: string }) {
   );
 }
 
+// ─── Live Demo Component ──────────────────────────────────────────────────────
+
+const PROVIDER_MODELS: Record<string, string[]> = {
+  openai: ["gpt-4o-mini", "gpt-4o", "gpt-4.1-mini"],
+  anthropic: ["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-6"],
+};
+
+function LiveDemo() {
+  const [provider, setProvider] = useState<"openai" | "anthropic">("openai");
+  const [model, setModel] = useState("gpt-4o-mini");
+  const [apiKey, setApiKey] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [result, setResult] = useState<EvalResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  function handleProviderChange(p: "openai" | "anthropic") {
+    setProvider(p);
+    setModel(PROVIDER_MODELS[p][0]);
+    setResult(null);
+    setStatus("idle");
+  }
+
+  async function handleRun() {
+    if (!apiKey.trim()) return;
+    setStatus("loading");
+    setResult(null);
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/evaluate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: 3, max_cases: 5 }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data.error ?? "Evaluation failed");
+        setStatus("error");
+        return;
+      }
+      setResult(data as EvalResult);
+      setStatus("done");
+    } catch {
+      setErrorMsg("Could not reach the server. Make sure the backend is running.");
+      setStatus("error");
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">
+      <div className="grid sm:grid-cols-2 gap-8">
+        {/* ── Form ── */}
+        <div className="space-y-5">
+          {/* Provider toggle */}
+          <div>
+            <label className="text-xs text-zinc-500 uppercase tracking-wider font-semibold block mb-2">
+              Provider
+            </label>
+            <div className="flex gap-2">
+              {(["openai", "anthropic"] as const).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => handleProviderChange(p)}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${
+                    provider === p
+                      ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20"
+                      : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  {p === "openai" ? "OpenAI" : "Anthropic"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Model select */}
+          <div>
+            <label className="text-xs text-zinc-500 uppercase tracking-wider font-semibold block mb-2">
+              Model
+            </label>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-100 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all"
+            >
+              {PROVIDER_MODELS[provider].map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* API Key */}
+          <div>
+            <label className="text-xs text-zinc-500 uppercase tracking-wider font-semibold block mb-2">
+              API Key
+            </label>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder={provider === "openai" ? "sk-..." : "sk-ant-..."}
+              className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-600 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all font-mono"
+            />
+            <p className="text-xs text-zinc-600 mt-2">
+              Your key is never stored. It goes directly to your model.
+            </p>
+          </div>
+
+          <button
+            onClick={handleRun}
+            disabled={status === "loading" || !apiKey.trim()}
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm transition-all shadow-lg shadow-blue-600/20"
+          >
+            {status === "loading" ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                Running 5 benchmark cases…
+              </span>
+            ) : "Run benchmark →"}
+          </button>
+
+          {status === "error" && (
+            <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">
+              {errorMsg}
+            </div>
+          )}
+        </div>
+
+        {/* ── Results ── */}
+        <div className="flex flex-col items-center justify-center min-h-[280px]">
+          {status === "idle" && (
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 rounded-2xl bg-zinc-800 flex items-center justify-center mx-auto">
+                <svg className="w-7 h-7 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                </svg>
+              </div>
+              <p className="text-zinc-500 text-sm">Your results will appear here</p>
+            </div>
+          )}
+
+          {status === "loading" && (
+            <div className="text-center space-y-4">
+              <div className="relative w-20 h-20 mx-auto">
+                <svg className="w-20 h-20 animate-spin" style={{ animationDuration: "3s" }} viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#27272a" strokeWidth="6" />
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#2563eb" strokeWidth="6"
+                    strokeDasharray="60 154" strokeLinecap="round" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-blue-400 text-xs font-bold">ASI</span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-zinc-300 text-sm font-medium">Benchmarking {model}</p>
+                <p className="text-zinc-600 text-xs">5 cases · 3 runs each · ~30 seconds</p>
+              </div>
+            </div>
+          )}
+
+          {status === "done" && result && (
+            <div className="w-full space-y-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-mono text-sm font-semibold text-zinc-200">{result.model}</p>
+                  <p className="text-xs text-zinc-500">{result.num_cases} cases · {result.run_count} runs</p>
+                </div>
+                <ASIGauge score={result.asi} />
+              </div>
+              <div className="space-y-3">
+                {Object.entries(result.domain_scores).map(([domain, score]) => (
+                  <DomainBar key={domain} label={domain} score={score} />
+                ))}
+              </div>
+              <button
+                onClick={() => { setStatus("idle"); setResult(null); setApiKey(""); }}
+                className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 text-xs font-medium transition-colors"
+              >
+                Run again
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
@@ -406,6 +605,23 @@ export default function Home() {
           <p className="text-center text-zinc-700 text-xs mt-6">
             ASI = Agent Stability Index (0–100, higher is better) · OpenAI text-embedding-3-small
           </p>
+        </div>
+      </section>
+
+      {/* ── Live Demo ── */}
+      <section className="py-20 px-6 border-t border-zinc-800/60">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-xs uppercase tracking-widest font-semibold text-blue-500 mb-3">Live demo</p>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-3">
+              Test your model right now
+            </h2>
+            <p className="text-zinc-400 text-sm max-w-lg mx-auto">
+              Enter your API key and get a real ASI score in under 60 seconds.
+              5 benchmark cases, 3 runs each.
+            </p>
+          </div>
+          <LiveDemo />
         </div>
       </section>
 
