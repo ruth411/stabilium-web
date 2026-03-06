@@ -1,38 +1,58 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --bg: #f6f8f5;
+  --bg-strong: #ecf0ea;
+  --surface: #ffffff;
+  --text: #13211d;
+  --text-muted: #4b615a;
+  --line: #d8e1dc;
+  --brand: #1f9d73;
+  --brand-ink: #0f5a41;
+  --accent: #1b3148;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: var(--font-sora), "Avenir Next", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(1200px 600px at 90% -10%, #d8f2e9 0%, transparent 60%),
+    radial-gradient(1000px 500px at -10% 0%, #dce8fb 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, #f9faf8 50%, var(--bg) 100%);
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
-  animation: fade-in 0.6s ease-out both;
+  animation: fade-in 0.65s ease-out both;
 }
 
 .animate-fade-in-delay {
-  animation: fade-in 0.6s ease-out 0.2s both;
+  animation: fade-in 0.65s ease-out 0.2s both;
 }
 
 .animate-fade-in-delay-2 {
-  animation: fade-in 0.6s ease-out 0.4s both;
+  animation: fade-in 0.65s ease-out 0.4s both;
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.6; }
+.glass {
+  background: color-mix(in oklab, var(--surface), transparent 8%);
+  border: 1px solid color-mix(in oklab, var(--line), transparent 15%);
+  box-shadow:
+    0 20px 60px rgba(21, 41, 31, 0.08),
+    0 2px 8px rgba(21, 41, 31, 0.06);
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 3s ease-in-out infinite;
+.mono {
+  font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
