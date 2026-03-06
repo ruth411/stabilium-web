@@ -185,18 +185,24 @@ export default function Home() {
             stabilium<span className="text-blue-500">.</span>
           </span>
           <div className="flex items-center gap-6 text-sm text-zinc-400">
-            <a href="#how-it-works" className="hover:text-zinc-100 transition-colors hidden sm:block">
+            <button
+              onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}
+              className="hover:text-zinc-100 transition-colors hidden sm:block"
+            >
               How it works
-            </a>
-            <a href="#pricing" className="hover:text-zinc-100 transition-colors hidden sm:block">
+            </button>
+            <button
+              onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
+              className="hover:text-zinc-100 transition-colors hidden sm:block"
+            >
               Pricing
-            </a>
-            <a
-              href="#waitlist"
+            </button>
+            <button
+              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
               className="px-4 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
             >
               Get early access
-            </a>
+            </button>
           </div>
         </div>
       </nav>
@@ -411,16 +417,16 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="#waitlist"
-                  className={`text-center py-2.5 rounded-lg font-medium text-sm transition-colors ${
+                <button
+                  onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
+                  className={`w-full text-center py-2.5 rounded-lg font-medium text-sm transition-colors ${
                     plan.highlight
                       ? "bg-blue-600 hover:bg-blue-500 text-white"
                       : "bg-zinc-800 hover:bg-zinc-700 text-zinc-100"
                   }`}
                 >
                   {plan.cta}
-                </a>
+                </button>
               </div>
             ))}
           </div>
