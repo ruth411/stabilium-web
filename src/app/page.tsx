@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type EvalResult = {
@@ -12,47 +11,60 @@ type EvalResult = {
   run_count: number;
 };
 
-const TRUST_POINTS = [
-  "Runs against 100+ benchmark cases",
-  "OpenAI + Anthropic adapters",
-  "Per-domain ASI scoring",
-  "Async jobs with report history",
-];
-
-const CAPABILITIES = [
+const FEATURES = [
   {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
     title: "Stability Certification",
-    body: "Run controlled benchmark suites before each release and block deploys when ASI drops below policy thresholds.",
+    body: "Run controlled benchmark suites before each release. Block deploys when ASI drops below your policy threshold.",
   },
   {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+      </svg>
+    ),
     title: "Model Swap Confidence",
-    body: "Compare candidate models side-by-side under identical prompts, mutations, and seeds before migration decisions.",
+    body: "Compare candidate models side-by-side under identical prompts, mutations, and seeds — before you commit.",
   },
   {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+      </svg>
+    ),
     title: "Compliance Evidence",
     body: "Generate structured reliability artifacts that support audits, vendor security reviews, and enterprise procurement.",
   },
   {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+      </svg>
+    ),
     title: "Drift Visibility",
     body: "Track behavior drift week-over-week so your team catches instability before it reaches production users.",
   },
 ];
 
-const PROCESS = [
+const STEPS = [
   {
-    step: "01",
+    n: "01",
     title: "Connect",
-    detail: "Use your own model API key for one-time runs. Keys are never persisted.",
+    body: "Point Stabilium at any OpenAI or Anthropic model with your API key. Keys are used for the run only — never stored.",
   },
   {
-    step: "02",
+    n: "02",
     title: "Benchmark",
-    detail: "Stabilium executes multi-case, multi-run evaluations with deterministic settings.",
+    body: "We execute 100+ cases with controlled mutations across 7 domains to stress-test consistency and correctness.",
   },
   {
-    step: "03",
+    n: "03",
     title: "Decide",
-    detail: "Use ASI and domain breakdowns to approve, rollback, or iterate with confidence.",
+    body: "Your ASI score and domain breakdown give you the signal to approve a release, rollback, or investigate further.",
   },
 ];
 
@@ -62,6 +74,7 @@ const PRICING = [
     price: "$0",
     note: "For initial validation",
     points: ["Manual runs", "Core ASI output", "Single workspace"],
+    featured: false,
   },
   {
     name: "Growth",
@@ -73,31 +86,58 @@ const PRICING = [
   {
     name: "Enterprise",
     price: "Custom",
-    note: "Security and compliance teams",
+    note: "For security & compliance teams",
     points: ["Dedicated support", "Custom benchmark packs", "Policy integrations"],
+    featured: false,
   },
 ];
 
-function scoreColor(score: number): string {
-  if (score >= 85) return "#1f9d73";
-  if (score >= 75) return "#da8d16";
-  return "#c4473b";
+const STATS = [
+  { value: "100+", label: "benchmark cases" },
+  { value: "6", label: "stability metrics" },
+  { value: "2+", label: "AI providers" },
+  { value: "1", label: "unified score" },
+];
+
+function scoreColor(v: number) {
+  if (v >= 85) return "#00d68f";
+  if (v >= 70) return "#f59e0b";
+  return "#ef4444";
 }
 
 function Gauge({ score }: { score: number }) {
   const color = scoreColor(score);
-  const style = {
-    background: `conic-gradient(${color} ${score * 3.6}deg, #d8e1dc ${score * 3.6}deg 360deg)`,
-  };
+  const r = 40;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (score / 100) * circ;
 
   return (
-    <div className="relative inline-flex h-28 w-28 items-center justify-center rounded-full p-1" style={style}>
-      <div className="absolute inset-2 rounded-full bg-white" />
-      <div className="relative text-center">
-        <div className="text-3xl font-bold tabular-nums" style={{ color }}>
+    <div className="relative inline-flex items-center justify-center">
+      <svg width="120" height="120" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
+        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
+        <circle
+          cx="50"
+          cy="50"
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeDasharray={circ}
+          strokeDashoffset={offset}
+          style={{
+            filter: `drop-shadow(0 0 6px ${color})`,
+            transition: "stroke-dashoffset 1s ease",
+          }}
+        />
+      </svg>
+      <div className="absolute text-center">
+        <div className="text-2xl font-black tabular-nums leading-none" style={{ color }}>
           {score.toFixed(1)}
         </div>
-        <div className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">ASI</div>
+        <div className="mono mt-0.5 text-[9px] uppercase tracking-[0.2em]" style={{ color: "#8b9ab0" }}>
+          ASI
+        </div>
       </div>
     </div>
   );
@@ -112,15 +152,21 @@ function DomainBars({ values }: { values: Record<string, number> }) {
       {entries.map(([domain, score]) => (
         <div key={domain} className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="capitalize text-[var(--text-muted)]">{domain}</span>
-            <span className="mono font-semibold" style={{ color: scoreColor(score) }}>
+            <span className="capitalize" style={{ color: "#8b9ab0" }}>
+              {domain}
+            </span>
+            <span className="mono font-bold" style={{ color: scoreColor(score) }}>
               {score.toFixed(1)}
             </span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--line)]">
+          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
             <div
               className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${Math.max(0, Math.min(100, score))}%`, background: scoreColor(score) }}
+              style={{
+                width: `${Math.max(0, Math.min(100, score))}%`,
+                background: scoreColor(score),
+                boxShadow: `0 0 8px ${scoreColor(score)}50`,
+              }}
             />
           </div>
         </div>
@@ -129,47 +175,58 @@ function DomainBars({ values }: { values: Record<string, number> }) {
   );
 }
 
-function WaitlistInline() {
+function WaitlistForm() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     if (!email.trim()) return;
     setStatus("loading");
-
     try {
-      const response = await fetch("/api/waitlist", {
+      const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      setStatus(response.ok ? "success" : "error");
-      if (response.ok) setEmail("");
+      setStatus(res.ok ? "done" : "error");
+      if (res.ok) setEmail("");
     } catch {
       setStatus("error");
     }
   }
 
+  if (status === "done") {
+    return (
+      <p className="text-sm font-semibold" style={{ color: "#00d68f" }}>
+        You&apos;re on the list — we&apos;ll be in touch soon.
+      </p>
+    );
+  }
+
   return (
-    <form onSubmit={submit} className="flex w-full flex-col gap-2 sm:flex-row">
+    <form onSubmit={submit} className="flex w-full flex-col gap-3 sm:flex-row">
       <input
         value={email}
-        onChange={(event) => setEmail(event.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         type="email"
         required
-        placeholder="work email"
-        className="h-11 flex-1 rounded-xl border border-[var(--line)] bg-white px-4 text-sm outline-none focus:border-[var(--brand)]"
+        placeholder="work@company.com"
+        className="h-12 flex-1 rounded-xl border px-4 text-sm outline-none transition"
+        style={{
+          background: "rgba(255,255,255,0.05)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          color: "#eef2f7",
+        }}
       />
       <button
         type="submit"
         disabled={status === "loading"}
-        className="h-11 rounded-xl bg-[var(--brand)] px-5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+        className="btn-primary h-12 rounded-xl px-7 text-sm"
       >
-        {status === "loading" ? "Submitting..." : "Join waitlist"}
+        {status === "loading" ? "Joining…" : "Join waitlist →"}
       </button>
-      {status === "success" ? <p className="text-xs text-[var(--brand-ink)]">You&apos;re in.</p> : null}
-      {status === "error" ? <p className="text-xs text-[#b83b2f]">Could not submit right now.</p> : null}
+      {status === "error" && <p className="text-xs text-red-400">Could not submit. Try again.</p>}
     </form>
   );
 }
@@ -178,234 +235,452 @@ export default function HomePage() {
   const [provider, setProvider] = useState<"openai" | "anthropic">("openai");
   const [model, setModel] = useState("gpt-4o-mini");
   const [apiKey, setApiKey] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "error" | "done">("idle");
+  const [evalStatus, setEvalStatus] = useState<"idle" | "loading" | "error" | "done">("idle");
   const [result, setResult] = useState<EvalResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [evalError, setEvalError] = useState<string | null>(null);
 
-  const headingScore = useMemo(() => result?.asi ?? 83.9, [result]);
+  const heroScore = useMemo(() => result?.asi ?? 83.9, [result]);
 
-  async function runLiveEvaluation(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function runEval(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     if (!apiKey.trim()) return;
-
-    setStatus("loading");
-    setError(null);
-
+    setEvalStatus("loading");
+    setEvalError(null);
     try {
-      const response = await fetch("/api/evaluate", {
+      const res = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          provider,
-          model,
-          api_key: apiKey,
-          run_count: 3,
-          max_cases: 5,
-        }),
+        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: 3, max_cases: 5 }),
       });
-
-      const payload = (await response.json()) as EvalResult | { error?: string };
-      if (!response.ok) {
-        const message = (payload as { error?: string }).error ?? "Evaluation failed.";
-        setStatus("error");
-        setError(message);
+      const data = (await res.json()) as EvalResult | { error?: string };
+      if (!res.ok) {
+        setEvalStatus("error");
+        setEvalError((data as { error?: string }).error ?? "Evaluation failed.");
         return;
       }
-
-      setResult(payload as EvalResult);
+      setResult(data as EvalResult);
       setApiKey("");
-      setStatus("done");
+      setEvalStatus("done");
     } catch {
-      setStatus("error");
-      setError("Backend unavailable. Please try again.");
+      setEvalStatus("error");
+      setEvalError("Backend unavailable. Please try again.");
     }
   }
 
   return (
-    <main className="relative overflow-hidden px-6 pb-20 pt-8 md:px-10 lg:px-16">
-      <div className="pointer-events-none absolute -left-24 top-24 h-80 w-80 rounded-full bg-[#c3e5db]/40 blur-3xl" />
-      <div className="pointer-events-none absolute -right-32 top-10 h-96 w-96 rounded-full bg-[#b6caec]/45 blur-3xl" />
+    <div className="min-h-screen" style={{ background: "#08090f" }}>
+      {/* Fixed gradient blobs */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute -top-60 -right-60 h-[700px] w-[700px] rounded-full opacity-[0.18] blur-[130px]"
+          style={{ background: "radial-gradient(circle, #00d68f, transparent 70%)" }}
+        />
+        <div
+          className="absolute -bottom-60 -left-60 h-[600px] w-[600px] rounded-full opacity-[0.14] blur-[110px]"
+          style={{ background: "radial-gradient(circle, #5b7cf7, transparent 70%)" }}
+        />
+      </div>
 
-      <div className="mx-auto max-w-7xl space-y-16">
-        <header className="animate-fade-in flex items-center justify-between gap-4 rounded-2xl border border-[var(--line)] bg-white/85 px-5 py-4 backdrop-blur">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-[var(--accent)] text-white grid place-items-center mono text-xs">S</div>
-            <div>
-              <div className="mono text-[11px] tracking-[0.2em] text-[var(--text-muted)]">STABILIUM</div>
-              <div className="text-sm font-semibold">AI Reliability Infrastructure</div>
-            </div>
+      {/* Nav */}
+      <nav
+        className="relative z-50 flex items-center justify-between px-6 py-4 md:px-12"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(8px)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="mono grid h-8 w-8 place-items-center rounded-lg text-xs font-black text-black"
+            style={{ background: "linear-gradient(135deg, #00d68f, #00a06a)" }}
+          >
+            S
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/app" className="rounded-lg border border-[var(--line)] px-3 py-2 text-sm font-medium hover:bg-[var(--bg-strong)]">
-              Open app
-            </Link>
-            <a href="#waitlist" className="rounded-lg bg-[var(--brand)] px-3 py-2 text-sm font-semibold text-white hover:brightness-110">
-              Join waitlist
-            </a>
-          </div>
-        </header>
+          <span className="font-bold tracking-tight text-white">Stabilium</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}
+            className="hidden px-3 py-2 text-sm transition hover:text-white sm:block"
+            style={{ color: "#8b9ab0" }}
+          >
+            Live demo
+          </button>
+          <button
+            onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
+            className="hidden px-3 py-2 text-sm transition hover:text-white sm:block"
+            style={{ color: "#8b9ab0" }}
+          >
+            Pricing
+          </button>
+          <button
+            onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
+            className="btn-primary rounded-lg px-4 py-2 text-sm"
+          >
+            Join waitlist
+          </button>
+        </div>
+      </nav>
 
-        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
-          <div className="animate-fade-in space-y-6">
-            <div className="inline-flex items-center rounded-full border border-[var(--line)] bg-white px-3 py-1 mono text-[11px] tracking-[0.16em] text-[var(--text-muted)]">
-              Continuous AI Stability Validation
-            </div>
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-[var(--text)] md:text-6xl">
-              The reliability control plane for production AI agents.
-            </h1>
-            <p className="max-w-2xl text-lg leading-relaxed text-[var(--text-muted)]">
-              Stabilium gives engineering and compliance teams a defensible stability score, domain-level diagnostics,
-              and release-ready evidence before users feel drift.
+      <main className="relative z-10 mx-auto max-w-7xl px-6 md:px-12">
+        {/* ── Hero ── */}
+        <section className="pb-20 pt-24 text-center">
+          <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold mb-8"
+            style={{ border: "1px solid rgba(0,214,143,0.25)", color: "#00d68f", background: "rgba(0,214,143,0.06)" }}>
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
+            Private beta — limited access
+          </div>
+
+          <h1
+            className="animate-fade-up-1 mx-auto max-w-4xl text-5xl font-black leading-[1.05] tracking-tight md:text-7xl"
+            style={{ color: "#eef2f7" }}
+          >
+            Know if your AI is{" "}
+            <span className="gradient-text">reliable enough</span> for
+            production.
+          </h1>
+
+          <p
+            className="animate-fade-up-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed"
+            style={{ color: "#8b9ab0" }}
+          >
+            Stabilium gives engineering and compliance teams a single stability
+            score — with domain-level diagnostics and release-ready evidence —
+            before users feel drift.
+          </p>
+
+          <div className="animate-fade-up-3 mt-10 flex flex-wrap items-center justify-center gap-4">
+            <button
+              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
+              className="btn-primary h-12 rounded-xl px-8 text-sm"
+              style={{ boxShadow: "0 0 32px rgba(0,214,143,0.28)" }}
+            >
+              Get early access →
+            </button>
+            <button
+              onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}
+              className="h-12 rounded-xl border px-8 text-sm font-semibold text-white transition hover:bg-white/5"
+              style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+            >
+              Try live demo
+            </button>
+          </div>
+
+          {/* Score */}
+          <div className="mt-16 flex flex-col items-center gap-3 animate-fade-up-3">
+            <Gauge score={heroScore} />
+            <p className="mono text-xs uppercase tracking-[0.2em]" style={{ color: "#8b9ab0" }}>
+              {result ? `${result.model} · live result` : "sample score"}
             </p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {TRUST_POINTS.map((point) => (
-                <div key={point} className="glass rounded-xl px-4 py-3 text-sm text-[var(--text-muted)]">
-                  {point}
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <Gauge score={headingScore} />
-              <div>
-                <p className="mono text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Current sample score</p>
-                <p className="text-2xl font-bold text-[var(--text)]">{headingScore.toFixed(1)} ASI</p>
-                <p className="text-sm text-[var(--text-muted)]">Based on the same benchmark methodology used in CI runs.</p>
-              </div>
-            </div>
           </div>
 
-          <div className="animate-fade-in-delay glass rounded-2xl p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Live Reliability Sandbox</h2>
-              <span className="mono text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Real run</span>
-            </div>
+          {/* Stats bar */}
+          <div
+            className="mt-16 grid grid-cols-2 overflow-hidden rounded-2xl md:grid-cols-4"
+            style={{ border: "1px solid rgba(255,255,255,0.07)" }}
+          >
+            {STATS.map((s) => (
+              <div
+                key={s.label}
+                className="px-6 py-5 text-center"
+                style={{ background: "rgba(255,255,255,0.03)" }}
+              >
+                <div className="text-3xl font-black tabular-nums" style={{ color: "#00d68f" }}>
+                  {s.value}
+                </div>
+                <div className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-            <form onSubmit={runLiveEvaluation} className="space-y-4">
+        {/* ── Features ── */}
+        <section className="py-16">
+          <div className="mb-12 text-center">
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+              Capabilities
+            </p>
+            <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
+              Everything you need to certify AI reliability
+            </h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {FEATURES.map((f) => (
+              <article key={f.title} className="glow-card rounded-2xl p-6">
+                <div className="mb-4" style={{ color: "#00d68f" }}>
+                  {f.icon}
+                </div>
+                <h3 className="mb-2 font-bold text-white">{f.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#8b9ab0" }}>
+                  {f.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* ── How it works ── */}
+        <section className="py-16">
+          <div className="mb-12 text-center">
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+              Process
+            </p>
+            <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
+              How it works
+            </h2>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {STEPS.map((step, i) => (
+              <article key={step.n} className="glow-card relative rounded-2xl p-7">
+                {i < STEPS.length - 1 && (
+                  <span className="absolute -right-2 top-8 hidden text-xl lg:block" style={{ color: "rgba(255,255,255,0.15)" }}>
+                    →
+                  </span>
+                )}
+                <p className="mono mb-4 text-4xl font-black opacity-20" style={{ color: "#00d68f" }}>
+                  {step.n}
+                </p>
+                <h3 className="mb-2 text-xl font-bold text-white">{step.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#8b9ab0" }}>
+                  {step.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Live Demo ── */}
+        <section id="demo" className="py-16">
+          <div className="mb-12 text-center">
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+              Live demo
+            </p>
+            <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
+              Run a real benchmark now
+            </h2>
+            <p className="mt-3 text-sm" style={{ color: "#8b9ab0" }}>
+              Your API key is used for the run only — never stored or logged.
+            </p>
+          </div>
+
+          <div className="mx-auto max-w-3xl glow-card rounded-2xl p-8">
+            <form onSubmit={runEval} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm">
-                  <span className="mb-1 block text-[var(--text-muted)]">Provider</span>
+                <label className="block text-sm">
+                  <span className="mb-2 block font-medium" style={{ color: "#8b9ab0" }}>
+                    Provider
+                  </span>
                   <select
                     value={provider}
-                    onChange={(event) => {
-                      const next = event.target.value as "openai" | "anthropic";
-                      setProvider(next);
-                      setModel(next === "openai" ? "gpt-4o-mini" : "claude-haiku-4-5");
+                    onChange={(e) => {
+                      const v = e.target.value as "openai" | "anthropic";
+                      setProvider(v);
+                      setModel(v === "openai" ? "gpt-4o-mini" : "claude-haiku-4-5");
                     }}
-                    className="h-10 w-full rounded-lg border border-[var(--line)] bg-white px-3"
+                    className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                    }}
                   >
                     <option value="openai">OpenAI</option>
                     <option value="anthropic">Anthropic</option>
                   </select>
                 </label>
-                <label className="text-sm">
-                  <span className="mb-1 block text-[var(--text-muted)]">Model</span>
+                <label className="block text-sm">
+                  <span className="mb-2 block font-medium" style={{ color: "#8b9ab0" }}>
+                    Model
+                  </span>
                   <input
                     value={model}
-                    onChange={(event) => setModel(event.target.value)}
-                    className="h-10 w-full rounded-lg border border-[var(--line)] bg-white px-3"
+                    onChange={(e) => setModel(e.target.value)}
+                    className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                    }}
                     required
                   />
                 </label>
               </div>
 
-              <label className="text-sm block">
-                <span className="mb-1 block text-[var(--text-muted)]">API key (one-time run, not stored)</span>
+              <label className="block text-sm">
+                <span className="mb-2 block font-medium" style={{ color: "#8b9ab0" }}>
+                  API key (one-time, not stored)
+                </span>
                 <input
                   type="password"
                   value={apiKey}
-                  onChange={(event) => setApiKey(event.target.value)}
-                  className="h-10 w-full rounded-lg border border-[var(--line)] bg-white px-3"
+                  onChange={(e) => setApiKey(e.target.value)}
                   placeholder="sk-..."
+                  className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}
                   required
                 />
               </label>
 
               <button
                 type="submit"
-                disabled={status === "loading" || !apiKey.trim()}
-                className="h-11 w-full rounded-lg bg-[var(--accent)] text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+                disabled={evalStatus === "loading" || !apiKey.trim()}
+                className="btn-primary h-12 w-full rounded-xl text-sm"
               >
-                {status === "loading" ? "Running benchmark..." : "Run benchmark"}
+                {evalStatus === "loading" ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span
+                      className="animate-spin h-3.5 w-3.5 rounded-full border-2"
+                      style={{ borderColor: "rgba(0,0,0,0.2)", borderTopColor: "#000" }}
+                    />
+                    Running benchmark…
+                  </span>
+                ) : (
+                  "Run benchmark →"
+                )}
               </button>
             </form>
 
-            <div className="mt-6 rounded-xl border border-[var(--line)] bg-white p-4">
-              {status === "error" && error ? <p className="text-sm text-[#b83b2f]">{error}</p> : null}
-              {result ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-[var(--text)]">{result.model}</p>
-                    <p className="mono text-xs text-[var(--text-muted)]">
-                      {result.num_cases} cases · {result.run_count} runs
-                    </p>
+            {(evalStatus === "error" || result) && (
+              <div
+                className="mt-6 rounded-xl p-5"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              >
+                {evalStatus === "error" && evalError && (
+                  <p className="text-sm text-red-400">{evalError}</p>
+                )}
+                {result && (
+                  <div className="space-y-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-bold text-white">{result.model}</p>
+                        <p className="mono mt-0.5 text-xs" style={{ color: "#8b9ab0" }}>
+                          {result.num_cases} cases · {result.run_count} runs
+                        </p>
+                      </div>
+                      <Gauge score={result.asi} />
+                    </div>
+                    <DomainBars values={result.domain_scores} />
                   </div>
-                  <DomainBars values={result.domain_scores} />
-                </div>
-              ) : (
-                <p className="text-sm text-[var(--text-muted)]">Run a live sample to see domain-level ASI output.</p>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
 
-        <section className="animate-fade-in-delay grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {CAPABILITIES.map((item) => (
-            <article key={item.title} className="glass rounded-2xl p-5">
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">{item.body}</p>
-            </article>
-          ))}
+        {/* ── Pricing ── */}
+        <section id="pricing" className="py-16">
+          <div className="mb-12 text-center">
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+              Pricing
+            </p>
+            <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
+              Simple, transparent pricing
+            </h2>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {PRICING.map((plan) => (
+              <article
+                key={plan.name}
+                className="relative rounded-2xl p-7"
+                style={{
+                  background: plan.featured
+                    ? "linear-gradient(135deg, rgba(0,214,143,0.09), rgba(0,214,143,0.03))"
+                    : "rgba(255,255,255,0.03)",
+                  border: plan.featured
+                    ? "1px solid rgba(0,214,143,0.35)"
+                    : "1px solid rgba(255,255,255,0.07)",
+                  boxShadow: plan.featured ? "0 0 48px rgba(0,214,143,0.1)" : undefined,
+                }}
+              >
+                {plan.featured && (
+                  <div
+                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold text-black"
+                    style={{ background: "linear-gradient(135deg, #00d68f, #00b87a)" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
+                <p className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+                  {plan.note}
+                </p>
+                <p
+                  className="mt-6 text-5xl font-black tracking-tight"
+                  style={{ color: plan.featured ? "#00d68f" : "#eef2f7" }}
+                >
+                  {plan.price}
+                </p>
+                <ul className="mt-6 space-y-2.5">
+                  {plan.points.map((pt) => (
+                    <li key={pt} className="flex items-center gap-2 text-sm" style={{ color: "#8b9ab0" }}>
+                      <span style={{ color: "#00d68f" }}>✓</span>
+                      {pt}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
+                  className={`mt-8 h-11 w-full rounded-xl text-sm font-bold transition ${plan.featured ? "btn-primary" : "text-white hover:bg-white/5"}`}
+                  style={
+                    plan.featured
+                      ? undefined
+                      : { border: "1px solid rgba(255,255,255,0.1)" }
+                  }
+                >
+                  {plan.price === "Custom" ? "Contact us" : "Get started"}
+                </button>
+              </article>
+            ))}
+          </div>
         </section>
 
-        <section className="animate-fade-in-delay-2 grid gap-4 lg:grid-cols-3">
-          {PROCESS.map((item) => (
-            <article key={item.step} className="glass rounded-2xl p-5">
-              <p className="mono text-xs tracking-[0.2em] text-[var(--brand-ink)]">STEP {item.step}</p>
-              <h3 className="mt-2 text-xl font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm text-[var(--text-muted)]">{item.detail}</p>
-            </article>
-          ))}
+        {/* ── Waitlist ── */}
+        <section id="waitlist" className="py-16 pb-24">
+          <div
+            className="rounded-3xl p-10 text-center md:p-16"
+            style={{
+              background: "linear-gradient(135deg, rgba(0,214,143,0.07), rgba(91,124,247,0.06))",
+              border: "1px solid rgba(0,214,143,0.15)",
+              boxShadow: "0 0 80px rgba(0,214,143,0.07)",
+            }}
+          >
+            <p className="mono mb-4 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+              Early access
+            </p>
+            <h2 className="mb-4 text-4xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
+              Get invited to the private beta
+            </h2>
+            <p className="mx-auto mb-10 max-w-xl text-sm leading-relaxed" style={{ color: "#8b9ab0" }}>
+              Join engineering teams using Stabilium to enforce reliability standards before AI changes
+              reach production.
+            </p>
+            <div className="mx-auto max-w-md">
+              <WaitlistForm />
+            </div>
+          </div>
         </section>
+      </main>
 
-        <section className="grid gap-4 lg:grid-cols-3">
-          {PRICING.map((plan) => (
-            <article
-              key={plan.name}
-              className={`rounded-2xl border p-6 ${
-                plan.featured
-                  ? "border-[var(--accent)] bg-[var(--accent)] text-white"
-                  : "border-[var(--line)] bg-white"
-              }`}
+      {/* Footer */}
+      <footer
+        className="relative z-10 px-6 py-8 md:px-12"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="flex items-center gap-2">
+            <div
+              className="mono grid h-6 w-6 place-items-center rounded-md text-[10px] font-black text-black"
+              style={{ background: "linear-gradient(135deg, #00d68f, #00a06a)" }}
             >
-              <h3 className="text-xl font-semibold">{plan.name}</h3>
-              <p className={`mt-1 text-sm ${plan.featured ? "text-white/80" : "text-[var(--text-muted)]"}`}>{plan.note}</p>
-              <p className="mt-5 text-4xl font-black tracking-tight">{plan.price}</p>
-              <ul className="mt-5 space-y-2 text-sm">
-                {plan.points.map((point) => (
-                  <li key={point} className={plan.featured ? "text-white/90" : "text-[var(--text-muted)]"}>
-                    • {point}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </section>
-
-        <section id="waitlist" className="glass rounded-3xl p-8 md:p-10">
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
-            <div>
-              <p className="mono text-xs uppercase tracking-[0.2em] text-[var(--brand-ink)]">Early access</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Get invited to the private beta</h2>
-              <p className="mt-2 max-w-2xl text-sm text-[var(--text-muted)]">
-                Join engineering teams using Stabilium to enforce reliability standards before AI changes reach production.
-              </p>
+              S
             </div>
-            <div className="md:w-[360px]">
-              <WaitlistInline />
-            </div>
+            <span className="text-sm font-bold text-white">Stabilium</span>
           </div>
-        </section>
-      </div>
-    </main>
+          <p className="text-xs" style={{ color: "#8b9ab0" }}>
+            © {new Date().getFullYear()} Stabilium — AI reliability infrastructure.
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 }

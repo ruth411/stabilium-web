@@ -1,31 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f6f8f5;
-  --bg-strong: #ecf0ea;
-  --surface: #ffffff;
-  --text: #13211d;
-  --text-muted: #4b615a;
-  --line: #d8e1dc;
-  --brand: #1f9d73;
-  --brand-ink: #0f5a41;
-  --accent: #1b3148;
+  --brand: #00d68f;
+  --brand-dark: #00a06a;
+  --accent: #5b7cf7;
+  --text: #eef2f7;
+  --text-muted: #8b9ab0;
+  --line: rgba(255, 255, 255, 0.07);
+  --surface: rgba(255, 255, 255, 0.03);
 }
 
 body {
   min-height: 100vh;
   color: var(--text);
+  background: #08090f;
   font-family: var(--font-sora), "Avenir Next", "Segoe UI", sans-serif;
-  background:
-    radial-gradient(1200px 600px at 90% -10%, #d8f2e9 0%, transparent 60%),
-    radial-gradient(1000px 500px at -10% 0%, #dce8fb 0%, transparent 55%),
-    linear-gradient(180deg, var(--bg) 0%, #f9faf8 50%, var(--bg) 100%);
 }
 
-@keyframes fade-in {
+@keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -33,26 +28,68 @@ body {
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.65s ease-out both;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.animate-fade-in-delay {
-  animation: fade-in 0.65s ease-out 0.2s both;
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
 }
 
-.animate-fade-in-delay-2 {
-  animation: fade-in 0.65s ease-out 0.4s both;
+.animate-fade-up-1 {
+  animation: fade-up 0.7s ease-out 0.1s both;
 }
 
-.glass {
-  background: color-mix(in oklab, var(--surface), transparent 8%);
-  border: 1px solid color-mix(in oklab, var(--line), transparent 15%);
-  box-shadow:
-    0 20px 60px rgba(21, 41, 31, 0.08),
-    0 2px 8px rgba(21, 41, 31, 0.06);
+.animate-fade-up-2 {
+  animation: fade-up 0.7s ease-out 0.2s both;
+}
+
+.animate-fade-up-3 {
+  animation: fade-up 0.7s ease-out 0.35s both;
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
 }
 
 .mono {
   font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #00d68f 30%, #5b7cf7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s;
+}
+
+.glow-card:hover {
+  border-color: rgba(0, 214, 143, 0.25);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00d68f, #00b87a);
+  color: #000;
+  font-weight: 700;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+  transform: scale(1.01);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  transform: none;
+  cursor: not-allowed;
 }
