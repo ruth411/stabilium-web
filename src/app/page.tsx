@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type EvalResult = {
@@ -175,61 +176,6 @@ function DomainBars({ values }: { values: Record<string, number> }) {
   );
 }
 
-function WaitlistForm() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setStatus("loading");
-    try {
-      const res = await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      setStatus(res.ok ? "done" : "error");
-      if (res.ok) setEmail("");
-    } catch {
-      setStatus("error");
-    }
-  }
-
-  if (status === "done") {
-    return (
-      <p className="text-sm font-semibold" style={{ color: "#00d68f" }}>
-        You&apos;re on the list — we&apos;ll be in touch soon.
-      </p>
-    );
-  }
-
-  return (
-    <form onSubmit={submit} className="flex w-full flex-col gap-3 sm:flex-row">
-      <input
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        type="email"
-        required
-        placeholder="work@company.com"
-        className="h-12 flex-1 rounded-xl border px-4 text-sm outline-none transition"
-        style={{
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          color: "#eef2f7",
-        }}
-      />
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="btn-primary h-12 rounded-xl px-7 text-sm"
-      >
-        {status === "loading" ? "Joining…" : "Join waitlist →"}
-      </button>
-      {status === "error" && <p className="text-xs text-red-400">Could not submit. Try again.</p>}
-    </form>
-  );
-}
 
 export default function HomePage() {
   const [provider, setProvider] = useState<"openai" | "anthropic">("openai");
@@ -310,12 +256,16 @@ export default function HomePage() {
           >
             Pricing
           </button>
-          <button
-            onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-            className="btn-primary rounded-lg px-4 py-2 text-sm"
+          <Link
+            href="/app"
+            className="hidden px-3 py-2 text-sm transition hover:text-white sm:block"
+            style={{ color: "#8b9ab0" }}
           >
-            Join waitlist
-          </button>
+            Sign in
+          </Link>
+          <Link href="/app?mode=register" className="btn-primary rounded-lg px-4 py-2 text-sm">
+            Get started
+          </Link>
         </div>
       </nav>
 
@@ -347,13 +297,13 @@ export default function HomePage() {
           </p>
 
           <div className="animate-fade-up-3 mt-10 flex flex-wrap items-center justify-center gap-4">
-            <button
-              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-              className="btn-primary h-12 rounded-xl px-8 text-sm"
+            <Link
+              href="/app?mode=register"
+              className="btn-primary inline-flex h-12 items-center rounded-xl px-8 text-sm"
               style={{ boxShadow: "0 0 32px rgba(0,214,143,0.28)" }}
             >
-              Get early access →
-            </button>
+              Get started free →
+            </Link>
             <button
               onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}
               className="h-12 rounded-xl border px-8 text-sm font-semibold text-white transition hover:bg-white/5"
@@ -618,9 +568,9 @@ export default function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-                  className={`mt-8 h-11 w-full rounded-xl text-sm font-bold transition ${plan.featured ? "btn-primary" : "text-white hover:bg-white/5"}`}
+                <Link
+                  href={plan.price === "Custom" ? "mailto:hello@stabilium.io" : "/app?mode=register"}
+                  className={`mt-8 flex h-11 w-full items-center justify-center rounded-xl text-sm font-bold transition ${plan.featured ? "btn-primary" : "text-white hover:bg-white/5"}`}
                   style={
                     plan.featured
                       ? undefined
@@ -628,14 +578,14 @@ export default function HomePage() {
                   }
                 >
                   {plan.price === "Custom" ? "Contact us" : "Get started"}
-                </button>
+                </Link>
               </article>
             ))}
           </div>
         </section>
 
-        {/* ── Waitlist ── */}
-        <section id="waitlist" className="py-16 pb-24">
+        {/* ── CTA ── */}
+        <section className="py-16 pb-24">
           <div
             className="rounded-3xl p-10 text-center md:p-16"
             style={{
@@ -645,17 +595,29 @@ export default function HomePage() {
             }}
           >
             <p className="mono mb-4 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
-              Early access
+              Start today
             </p>
             <h2 className="mb-4 text-4xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
-              Get invited to the private beta
+              Ready to certify your AI?
             </h2>
             <p className="mx-auto mb-10 max-w-xl text-sm leading-relaxed" style={{ color: "#8b9ab0" }}>
-              Join engineering teams using Stabilium to enforce reliability standards before AI changes
-              reach production.
+              Create a free account and run your first benchmark in minutes. No credit card required.
             </p>
-            <div className="mx-auto max-w-md">
-              <WaitlistForm />
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/app?mode=register"
+                className="btn-primary inline-flex h-12 items-center rounded-xl px-10 text-sm"
+                style={{ boxShadow: "0 0 32px rgba(0,214,143,0.25)" }}
+              >
+                Create free account →
+              </Link>
+              <Link
+                href="/app"
+                className="inline-flex h-12 items-center rounded-xl px-8 text-sm font-semibold text-white transition hover:bg-white/5"
+                style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                Sign in
+              </Link>
             </div>
           </div>
         </section>
