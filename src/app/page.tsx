@@ -196,7 +196,7 @@ export default function HomePage() {
       const res = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: 3, max_cases: 5 }),
+        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: 3, max_cases: 10 }),
       });
       const data = (await res.json()) as EvalResult | { error?: string };
       if (!res.ok) {
@@ -408,7 +408,7 @@ export default function HomePage() {
               Run a real benchmark now
             </h2>
             <p className="mt-3 text-sm" style={{ color: "#8b9ab0" }}>
-              Your API key is used for the run only — never stored or logged.
+              Free demo runs 10 cases. Sign up for full evaluations up to 100 cases.
             </p>
           </div>
 
