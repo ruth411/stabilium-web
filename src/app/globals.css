@@ -93,3 +93,53 @@ body {
   transform: none;
   cursor: not-allowed;
 }
+
+/* ── Print / PDF styles ───────────────────────────────────────────────────── */
+@media print {
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  /* Hide everything except the report panel */
+  nav,
+  .no-print,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  /* Show only the report */
+  [data-print-report] {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    color: #111 !important;
+  }
+
+  /* Invert text colours for print */
+  [data-print-report] * {
+    color: #111 !important;
+    border-color: #ddd !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+
+  /* Keep domain bar colours readable */
+  [data-domain-bar] {
+    background: #00a06a !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Force page break avoidance */
+  [data-print-report] > * {
+    break-inside: avoid;
+  }
+}

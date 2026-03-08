@@ -212,6 +212,155 @@ function AuthPanel({ initialMode, onAuth }: { initialMode: AuthMode; onAuth: (us
   );
 }
 
+// ── Report view ──────────────────────────────────────────────────────────────
+
+type AsiStatistics = {
+  mean?: number;
+  ci_low?: number;
+  ci_high?: number;
+  std?: number;
+  n?: number;
+};
+
+function asiColor(score: number): string {
+  if (score >= 0.85) return "#00d68f";
+  if (score >= 0.70) return "#f59e0b";
+  return "#ef4444";
+}
+
+function asiLabel(score: number): string {
+  if (score >= 0.85) return "Excellent";
+  if (score >= 0.70) return "Good";
+  return "Needs work";
+}
+
+function ReportView({ data }: { data: Record<string, unknown> }) {
+  const mean_asi = typeof data.mean_asi === "number" ? data.mean_asi : null;
+  const domain_scores =
+    data.domain_scores && typeof data.domain_scores === "object"
+      ? (data.domain_scores as Record<string, number>)
+      : {};
+  const asi_statistics =
+    data.asi_statistics && typeof data.asi_statistics === "object"
+      ? (data.asi_statistics as AsiStatistics)
+      : null;
+  const num_cases = typeof data.num_cases === "number" ? data.num_cases : null;
+  const run_count = typeof data.run_count === "number" ? data.run_count : null;
+  const suite_name = typeof data.suite_name === "string" ? data.suite_name : "—";
+  const benchmark_id = typeof data.benchmark_id === "string" ? data.benchmark_id : "—";
+
+  const color = mean_asi != null ? asiColor(mean_asi) : "#8b9ab0";
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = mean_asi != null ? circumference * (1 - mean_asi) : circumference;
+
+  return (
+    <div>
+      {/* Score + meta grid */}
+      <div className="grid gap-6 md:grid-cols-[160px_1fr]">
+        {/* Circular gauge */}
+        <div className="flex flex-col items-center gap-2">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+            <circle
+              cx="70" cy="70" r={radius}
+              fill="none"
+              stroke={color}
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={dashOffset}
+              transform="rotate(-90 70 70)"
+              style={{ filter: `drop-shadow(0 0 8px ${color})`, transition: "stroke-dashoffset 0.9s ease" }}
+            />
+            <text x="70" y="67" textAnchor="middle" fill={color} fontSize="26" fontWeight="900" fontFamily="monospace">
+              {mean_asi != null ? (mean_asi * 100).toFixed(0) : "—"}
+            </text>
+            <text x="70" y="83" textAnchor="middle" fill="#8b9ab0" fontSize="10">ASI score</text>
+          </svg>
+          {mean_asi != null && (
+            <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: `${color}22`, color }}>
+              {asiLabel(mean_asi)}
+            </span>
+          )}
+        </div>
+
+        {/* Metadata cards */}
+        <div className="grid content-start gap-3">
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: "Cases run", value: String(num_cases ?? "—") },
+              { label: "Runs / case", value: String(run_count ?? "—") },
+              { label: "Suite", value: suite_name },
+            ].map(({ label, value }) => (
+              <div key={label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <p className="mb-1 text-xs" style={{ color: "#8b9ab0" }}>{label}</p>
+                <p className="truncate text-sm font-bold text-white">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Confidence interval */}
+          {asi_statistics && typeof asi_statistics.ci_low === "number" && typeof asi_statistics.ci_high === "number" && (
+            <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <p className="mb-2 text-xs" style={{ color: "#8b9ab0" }}>95 % confidence interval</p>
+              <div className="flex items-center gap-3">
+                <span className="mono text-sm font-bold" style={{ color: "#00d68f" }}>
+                  {asi_statistics.ci_low.toFixed(3)}
+                </span>
+                <div className="h-1.5 flex-1 rounded-full" style={{ background: "rgba(255,255,255,0.07)" }}>
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${(mean_asi ?? 0) * 100}%`, background: "#00d68f", boxShadow: "0 0 6px #00d68f" }}
+                  />
+                </div>
+                <span className="mono text-sm font-bold" style={{ color: "#00d68f" }}>
+                  {asi_statistics.ci_high.toFixed(3)}
+                </span>
+              </div>
+              {typeof asi_statistics.std === "number" && (
+                <p className="mt-1.5 text-xs" style={{ color: "#8b9ab0" }}>
+                  σ = {asi_statistics.std.toFixed(3)} &nbsp;·&nbsp; n = {asi_statistics.n ?? "—"}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Domain breakdown */}
+      {Object.keys(domain_scores).length > 0 && (
+        <div className="mt-6">
+          <h3 className="mb-3 text-sm font-bold text-white">Domain breakdown</h3>
+          <div className="space-y-3">
+            {Object.entries(domain_scores).map(([domain, score]) => (
+              <div key={domain}>
+                <div className="mb-1 flex justify-between text-xs">
+                  <span className="capitalize" style={{ color: "#eef2f7" }}>{domain.replace(/_/g, " ")}</span>
+                  <span className="mono font-bold" style={{ color: asiColor(score) }}>{score.toFixed(2)}</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+                  <div
+                    data-domain-bar
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{ width: `${score * 100}%`, background: asiColor(score), boxShadow: `0 0 6px ${asiColor(score)}` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <p className="mt-5 text-xs" style={{ color: "#8b9ab0" }}>
+        Benchmark ID:{" "}
+        <span className="mono" style={{ color: "#5b7cf7" }}>{benchmark_id}</span>
+      </p>
+    </div>
+  );
+}
+
 // ── Dashboard ────────────────────────────────────────────────────────────────
 
 function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
@@ -484,29 +633,34 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
 
       {/* Report panel */}
       {selectedReport && (
-        <div style={cardStyle(true)}>
-          <div className="mb-4 flex items-center justify-between">
+        <div data-print-report style={cardStyle(true)}>
+          <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-bold text-white">
-              Report{" "}
+              Stability Report{" "}
               <span className="mono text-xs font-normal" style={{ color: "#8b9ab0" }}>
                 {selectedReport.job_id}
               </span>
             </h2>
-            <button
-              type="button"
-              onClick={() => setSelectedReport(null)}
-              className="text-xs transition hover:text-white"
-              style={{ color: "#8b9ab0" }}
-            >
-              Close ✕
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="rounded-xl px-3 py-1.5 text-xs font-semibold transition hover:opacity-80"
+                style={{ background: "rgba(0,214,143,0.12)", border: "1px solid rgba(0,214,143,0.3)", color: "#00d68f" }}
+              >
+                Download PDF
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedReport(null)}
+                className="rounded-xl px-3 py-1.5 text-xs font-medium transition hover:bg-white/5"
+                style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#8b9ab0" }}
+              >
+                Close ✕
+              </button>
+            </div>
           </div>
-          <pre
-            className="overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
-            style={{ background: "rgba(0,0,0,0.3)", color: "#a3e4c9", border: "1px solid rgba(255,255,255,0.06)" }}
-          >
-            {JSON.stringify(selectedReport.report, null, 2)}
-          </pre>
+          <ReportView data={selectedReport.report} />
         </div>
       )}
     </div>
