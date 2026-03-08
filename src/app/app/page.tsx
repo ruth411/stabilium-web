@@ -253,6 +253,32 @@ function asiLabel(score: number): string {
 }
 
 function ReportView({ data }: { data: Record<string, unknown> }) {
+  // Failure report
+  if (data.report_type === "job_failure") {
+    const reason = typeof data.failure_reason === "string" ? data.failure_reason : "Unknown error";
+    const completed = typeof data.completed_cases === "number" ? data.completed_cases : null;
+    const total = typeof data.total_cases === "number" ? data.total_cases : null;
+    return (
+      <div className="space-y-4">
+        <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
+          <span className="mt-0.5 text-lg">⚠</span>
+          <div>
+            <p className="font-bold" style={{ color: "#ef4444" }}>Evaluation failed</p>
+            <p className="mt-1 font-mono text-sm" style={{ color: "#fca5a5" }}>{reason}</p>
+          </div>
+        </div>
+        {completed != null && total != null && (
+          <p className="text-sm" style={{ color: "#8b9ab0" }}>
+            {completed} of {total} cases completed before failure.
+          </p>
+        )}
+        <p className="text-xs" style={{ color: "#8b9ab0" }}>
+          Check your API key and model name, then submit a new evaluation.
+        </p>
+      </div>
+    );
+  }
+
   const mean_asi = typeof data.mean_asi === "number" ? data.mean_asi : null;
   const domain_scores =
     data.domain_scores && typeof data.domain_scores === "object"
@@ -619,12 +645,13 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
             <tbody>
               {jobs.map((job) => {
                 const isActive = job.status === "running" || job.status === "queued";
+                const isFailed = job.status === "failed";
                 const pct = job.status === "running" && job.max_cases > 0
                   ? Math.min(100, Math.round((job.completed_cases / job.max_cases) * 100))
                   : 0;
                 return (
                   <React.Fragment key={job.id}>
-                    <tr style={{ borderBottom: isActive ? undefined : "1px solid rgba(255,255,255,0.04)" }}>
+                    <tr style={{ borderBottom: (isActive || isFailed) ? undefined : "1px solid rgba(255,255,255,0.04)" }}>
                       <td className="py-3 pr-4">
                         <StatusDot status={job.status} />
                       </td>
@@ -643,11 +670,14 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
                         <button
                           type="button"
                           onClick={() => void openReport(job.id)}
-                          disabled={job.status !== "completed"}
+                          disabled={job.status !== "completed" && job.status !== "failed"}
                           className="rounded-lg px-3 py-1 text-xs font-medium transition hover:bg-white/5 disabled:opacity-30"
-                          style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#eef2f7" }}
+                          style={{
+                            border: isFailed ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                            color: isFailed ? "#ef4444" : "#eef2f7",
+                          }}
                         >
-                          View report
+                          {isFailed ? "View error" : "View report"}
                         </button>
                       </td>
                     </tr>
@@ -689,6 +719,15 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
                         </td>
                       </tr>
                     )}
+                    {isFailed && job.error_message && (
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                        <td colSpan={7} className="pb-3 pt-0">
+                          <p className="mt-1 rounded-lg px-3 py-2 font-mono text-xs" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.18)", color: "#fca5a5" }}>
+                            {job.error_message}
+                          </p>
+                        </td>
+                      </tr>
+                    )}
                   </React.Fragment>
                 );
               })}
@@ -709,7 +748,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
         <div data-print-report style={cardStyle(true)}>
           <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-bold text-white">
-              Stability Report{" "}
+              {selectedReport.report.report_type === "job_failure" ? "Evaluation Error" : "Stability Report"}{" "}
               <span className="mono text-xs font-normal" style={{ color: "#8b9ab0" }}>
                 {selectedReport.job_id}
               </span>
