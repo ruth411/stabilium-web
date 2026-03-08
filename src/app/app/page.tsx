@@ -240,15 +240,16 @@ type AsiStatistics = {
   n?: number;
 };
 
+// ASI is on a 0–100 scale (see agent_stability_engine/report/schema.py)
 function asiColor(score: number): string {
-  if (score >= 0.85) return "#00d68f";
-  if (score >= 0.70) return "#f59e0b";
+  if (score >= 85) return "#00d68f";
+  if (score >= 70) return "#f59e0b";
   return "#ef4444";
 }
 
 function asiLabel(score: number): string {
-  if (score >= 0.85) return "Excellent";
-  if (score >= 0.70) return "Good";
+  if (score >= 85) return "Excellent";
+  if (score >= 70) return "Good";
   return "Needs work";
 }
 
@@ -279,6 +280,7 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
     );
   }
 
+  // ASI is 0–100
   const mean_asi = typeof data.mean_asi === "number" ? data.mean_asi : null;
   const domain_scores =
     data.domain_scores && typeof data.domain_scores === "object"
@@ -294,43 +296,52 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
   const benchmark_id = typeof data.benchmark_id === "string" ? data.benchmark_id : "—";
 
   const color = mean_asi != null ? asiColor(mean_asi) : "#8b9ab0";
-  const radius = 52;
+  const radius = 54;
   const circumference = 2 * Math.PI * radius;
-  const dashOffset = mean_asi != null ? circumference * (1 - mean_asi) : circumference;
+  // score is 0–100, so fraction = score/100
+  const dashOffset = mean_asi != null ? circumference * (1 - mean_asi / 100) : circumference;
 
   return (
-    <div>
-      {/* Score + meta grid */}
-      <div className="grid gap-6 md:grid-cols-[160px_1fr]">
+    <div className="space-y-6">
+      {/* Top row: gauge + stats */}
+      <div className="flex flex-wrap gap-6">
         {/* Circular gauge */}
-        <div className="flex flex-col items-center gap-2">
-          <svg width="140" height="140" viewBox="0 0 140 140">
-            <circle cx="70" cy="70" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+        <div className="flex flex-col items-center gap-3">
+          <svg width="148" height="148" viewBox="0 0 148 148">
+            {/* Track */}
+            <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" />
+            {/* Arc */}
             <circle
-              cx="70" cy="70" r={radius}
+              cx="74" cy="74" r={radius}
               fill="none"
               stroke={color}
-              strokeWidth="10"
+              strokeWidth="12"
               strokeLinecap="round"
               strokeDasharray={circumference}
               strokeDashoffset={dashOffset}
-              transform="rotate(-90 70 70)"
-              style={{ filter: `drop-shadow(0 0 8px ${color})`, transition: "stroke-dashoffset 0.9s ease" }}
+              transform="rotate(-90 74 74)"
+              style={{ filter: `drop-shadow(0 0 10px ${color}88)`, transition: "stroke-dashoffset 1s ease" }}
             />
-            <text x="70" y="67" textAnchor="middle" fill={color} fontSize="26" fontWeight="900" fontFamily="monospace">
-              {mean_asi != null ? (mean_asi * 100).toFixed(0) : "—"}
+            {/* Score */}
+            <text x="74" y="68" textAnchor="middle" fill={color} fontSize="28" fontWeight="900" fontFamily="monospace">
+              {mean_asi != null ? mean_asi.toFixed(1) : "—"}
             </text>
-            <text x="70" y="83" textAnchor="middle" fill="#8b9ab0" fontSize="10">ASI score</text>
+            <text x="74" y="86" textAnchor="middle" fill="#8b9ab0" fontSize="11" fontFamily="sans-serif">
+              ASI score
+            </text>
           </svg>
           {mean_asi != null && (
-            <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: `${color}22`, color }}>
+            <span
+              className="rounded-full px-4 py-1 text-xs font-bold tracking-wide"
+              style={{ background: `${color}22`, color, border: `1px solid ${color}44` }}
+            >
               {asiLabel(mean_asi)}
             </span>
           )}
         </div>
 
-        {/* Metadata cards */}
-        <div className="grid content-start gap-3">
+        {/* Stat cards */}
+        <div className="flex flex-1 flex-col justify-center gap-3">
           <div className="grid grid-cols-3 gap-3">
             {[
               { label: "Cases run", value: String(num_cases ?? "—") },
@@ -346,25 +357,35 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
 
           {/* Confidence interval */}
           {asi_statistics && typeof asi_statistics.ci_low === "number" && typeof asi_statistics.ci_high === "number" && (
-            <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-              <p className="mb-2 text-xs" style={{ color: "#8b9ab0" }}>95 % confidence interval</p>
+            <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <p className="mb-3 text-xs font-medium" style={{ color: "#8b9ab0" }}>95% confidence interval</p>
               <div className="flex items-center gap-3">
-                <span className="mono text-sm font-bold" style={{ color: "#00d68f" }}>
-                  {asi_statistics.ci_low.toFixed(3)}
+                <span className="mono w-12 text-right text-sm font-bold" style={{ color }}>
+                  {asi_statistics.ci_low.toFixed(1)}
                 </span>
-                <div className="h-1.5 flex-1 rounded-full" style={{ background: "rgba(255,255,255,0.07)" }}>
+                <div className="relative h-2 flex-1 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.07)" }}>
+                  {/* CI range band */}
                   <div
-                    className="h-full rounded-full"
-                    style={{ width: `${(mean_asi ?? 0) * 100}%`, background: "#00d68f", boxShadow: "0 0 6px #00d68f" }}
+                    className="absolute inset-y-0 rounded-full opacity-30"
+                    style={{
+                      left: `${asi_statistics.ci_low}%`,
+                      right: `${100 - asi_statistics.ci_high}%`,
+                      background: color,
+                    }}
+                  />
+                  {/* Mean marker */}
+                  <div
+                    className="absolute inset-y-0 w-1 rounded-full"
+                    style={{ left: `${mean_asi ?? 0}%`, transform: "translateX(-50%)", background: color, boxShadow: `0 0 6px ${color}` }}
                   />
                 </div>
-                <span className="mono text-sm font-bold" style={{ color: "#00d68f" }}>
-                  {asi_statistics.ci_high.toFixed(3)}
+                <span className="mono w-12 text-sm font-bold" style={{ color }}>
+                  {asi_statistics.ci_high.toFixed(1)}
                 </span>
               </div>
               {typeof asi_statistics.std === "number" && (
-                <p className="mt-1.5 text-xs" style={{ color: "#8b9ab0" }}>
-                  σ = {asi_statistics.std.toFixed(3)} &nbsp;·&nbsp; n = {asi_statistics.n ?? "—"}
+                <p className="mt-2 text-xs" style={{ color: "#8b9ab0" }}>
+                  σ&nbsp;=&nbsp;{asi_statistics.std.toFixed(2)}&ensp;·&ensp;n&nbsp;=&nbsp;{asi_statistics.n ?? "—"}
                 </p>
               )}
             </div>
@@ -374,22 +395,24 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
 
       {/* Domain breakdown */}
       {Object.keys(domain_scores).length > 0 && (
-        <div className="mt-6">
-          <h3 className="mb-3 text-sm font-bold text-white">Domain breakdown</h3>
+        <div>
+          <h3 className="mb-4 text-sm font-semibold" style={{ color: "#8b9ab0", letterSpacing: "0.05em", textTransform: "uppercase", fontSize: "0.7rem" }}>Domain breakdown</h3>
           <div className="space-y-3">
             {Object.entries(domain_scores).map(([domain, score]) => (
-              <div key={domain}>
-                <div className="mb-1 flex justify-between text-xs">
-                  <span className="capitalize" style={{ color: "#eef2f7" }}>{domain.replace(/_/g, " ")}</span>
-                  <span className="mono font-bold" style={{ color: asiColor(score) }}>{score.toFixed(2)}</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+              <div key={domain} className="flex items-center gap-3">
+                <span className="w-36 shrink-0 truncate text-xs capitalize" style={{ color: "#eef2f7" }}>
+                  {domain.replace(/_/g, " ")}
+                </span>
+                <div className="relative h-2 flex-1 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
                   <div
                     data-domain-bar
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${score * 100}%`, background: asiColor(score), boxShadow: `0 0 6px ${asiColor(score)}` }}
+                    className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                    style={{ width: `${score}%`, background: asiColor(score), boxShadow: `0 0 6px ${asiColor(score)}88` }}
                   />
                 </div>
+                <span className="mono w-10 text-right text-xs font-bold" style={{ color: asiColor(score) }}>
+                  {score.toFixed(1)}
+                </span>
               </div>
             ))}
           </div>
@@ -397,9 +420,8 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
       )}
 
       {/* Footer */}
-      <p className="mt-5 text-xs" style={{ color: "#8b9ab0" }}>
-        Benchmark ID:{" "}
-        <span className="mono" style={{ color: "#5b7cf7" }}>{benchmark_id}</span>
+      <p className="border-t pt-4 text-xs" style={{ color: "#8b9ab0", borderColor: "rgba(255,255,255,0.06)" }}>
+        Benchmark ID &nbsp;<span className="mono" style={{ color: "#5b7cf7" }}>{benchmark_id}</span>
       </p>
     </div>
   );
