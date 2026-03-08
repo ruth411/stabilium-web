@@ -15,7 +15,7 @@ type User = {
 
 type Job = {
   id: string;
-  status: "queued" | "running" | "completed" | "failed";
+  status: "queued" | "running" | "completed" | "failed" | "cancelled";
   provider: string;
   model: string;
   run_count: number;
@@ -46,6 +46,7 @@ function statusColor(s: Job["status"]) {
   if (s === "completed") return "#00d68f";
   if (s === "running") return "#f59e0b";
   if (s === "failed") return "#ef4444";
+  if (s === "cancelled") return "#6b7280";
   return "#8b9ab0";
 }
 
@@ -503,6 +504,15 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
     }
   }
 
+  async function cancelJob(jobId: string) {
+    try {
+      const res = await fetch(`/api/jobs/${jobId}`, { method: "DELETE" });
+      if (res.ok) await loadJobs();
+    } catch {
+      // silently ignore — the polling loop will update the status
+    }
+  }
+
   async function openReport(jobId: string) {
     setJobError(null);
     try {
@@ -689,18 +699,30 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
                       </td>
                       <td className="py-3 pr-4 text-xs" style={{ color: "#8b9ab0" }}>{fmtDate(job.created_at)}</td>
                       <td className="py-3">
-                        <button
-                          type="button"
-                          onClick={() => void openReport(job.id)}
-                          disabled={job.status !== "completed" && job.status !== "failed"}
-                          className="rounded-lg px-3 py-1 text-xs font-medium transition hover:bg-white/5 disabled:opacity-30"
-                          style={{
-                            border: isFailed ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.1)",
-                            color: isFailed ? "#ef4444" : "#eef2f7",
-                          }}
-                        >
-                          {isFailed ? "View error" : "View report"}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {isActive && (
+                            <button
+                              type="button"
+                              onClick={() => void cancelJob(job.id)}
+                              className="rounded-lg px-3 py-1 text-xs font-medium transition hover:bg-white/5"
+                              style={{ border: "1px solid rgba(239,68,68,0.4)", color: "#ef4444" }}
+                            >
+                              Stop
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => void openReport(job.id)}
+                            disabled={job.status !== "completed" && job.status !== "failed"}
+                            className="rounded-lg px-3 py-1 text-xs font-medium transition hover:bg-white/5 disabled:opacity-30"
+                            style={{
+                              border: isFailed ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                              color: isFailed ? "#ef4444" : "#eef2f7",
+                            }}
+                          >
+                            {isFailed ? "View error" : "View report"}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                     {isActive && (
