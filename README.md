@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stabilium Web
 
-## Getting Started
+The Next.js frontend for [Stabilium](https://stabilium.ruthwikdovala.com) — a platform for benchmarking and tracking AI agent stability.
 
-First, run the development server:
+Backend engine repo: [ruth411/Stabilium](https://github.com/ruth411/Stabilium)
+
+---
+
+## What it does
+
+- **Landing page** — explains ASE, live demo with configurable case count and model/provider picker
+- **Auth** — signup (name + company + email + password) and login, session stored in an HTTPOnly cookie
+- **Dashboard** — submit benchmark evaluation jobs, view real-time progress bar per job, open formatted reports
+- **Report viewer** — ASI gauge, domain breakdown bars, confidence interval, download as PDF
+- **Dark theme** — `#08090f` background, `#00d68f` brand green, `#5b7cf7` accent blue
+
+---
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Hosting | Vercel |
+| Backend | FastAPI on Railway (`ruth411/Stabilium`) |
+
+---
+
+## Local setup
 
 ```bash
+npm install
+cp .env.local.example .env.local   # set BACKEND_URL
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description |
+|---|---|
+| `BACKEND_URL` | URL of the FastAPI backend, e.g. `https://your-app.railway.app` |
 
-## Learn More
+In development, `BACKEND_URL` defaults to `http://localhost:8000` if not set.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Key pages & routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Route | Description |
+|---|---|
+| `/` | Landing page with hero, features, how-it-works, pricing, live demo |
+| `/app` | Auth panel (sign in / sign up) + dashboard after login |
+| `/api/auth/login` | Next.js proxy → FastAPI `/auth/login`, sets HTTPOnly session cookie |
+| `/api/auth/register` | Next.js proxy → FastAPI `/auth/register` |
+| `/api/auth/me` | Next.js proxy → FastAPI `/auth/me` |
+| `/api/auth/logout` | Clears session cookie |
+| `/api/jobs` | Proxy for job list and job creation |
+| `/api/jobs/[id]/report` | Proxy for report JSON |
+| `/api/evaluate` | Proxy for the synchronous live demo endpoint |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## User registration fields
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+When a user signs up, the following are collected and stored:
+
+| Field | Description |
+|---|---|
+| Full name | Personal name (e.g. Jane Smith) |
+| Company / project name | Organisation or project the user represents |
+| Email | Used for login |
+| Password | Hashed with PBKDF2-SHA256 on the backend, never stored in plain text |
+
+---
+
+## Dashboard features
+
+- **Run new evaluation** — choose provider (OpenAI / Anthropic), enter model name, API key (not stored), run count, max cases, seed
+- **Your evaluations table** — live status (queued → running → completed), ASI score, case count
+- **Progress bar** — running jobs show a green filled bar with `X of Y cases complete · Z%`, updated every 2.5 s
+- **Report panel** — click "View report" on a completed job to see:
+  - Circular ASI gauge with glow (green ≥ 0.85, amber ≥ 0.70, red < 0.70)
+  - 95% confidence interval bar
+  - Domain breakdown (reasoning, coding, safety, planning, …)
+  - Download PDF button (`window.print()` with print-only CSS)
+
+---
+
+## Development commands
+
+```bash
+npm run dev      # local dev server
+npm run build    # production build (also type-checks)
+npm run lint     # ESLint
+```
