@@ -7,6 +7,7 @@ import { Suspense } from "react";
 
 type User = {
   id: string;
+  name: string;
   business_name: string;
   email: string;
   created_at: string;
@@ -94,6 +95,7 @@ function cardStyle(featured = false): React.CSSProperties {
 
 function AuthPanel({ initialMode, onAuth }: { initialMode: AuthMode; onAuth: (user: User) => void }) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
+  const [name, setName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -107,7 +109,10 @@ function AuthPanel({ initialMode, onAuth }: { initialMode: AuthMode; onAuth: (us
     try {
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
       const body: Record<string, string> = { email, password };
-      if (mode === "register") body.business_name = businessName;
+      if (mode === "register") {
+        body.name = name;
+        body.business_name = businessName;
+      }
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -155,15 +160,27 @@ function AuthPanel({ initialMode, onAuth }: { initialMode: AuthMode; onAuth: (us
 
         <form onSubmit={submit} className="flex flex-col gap-4">
           {mode === "register" && (
-            <Field label="Company / project name">
-              <input
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                className="h-11 rounded-xl px-3 outline-none transition focus:border-[#00d68f]/50"
-                style={fieldStyle()}
-                required
-              />
-            </Field>
+            <>
+              <Field label="Full name">
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Jane Smith"
+                  className="h-11 rounded-xl px-3 outline-none transition focus:border-[#00d68f]/50"
+                  style={fieldStyle()}
+                  required
+                />
+              </Field>
+              <Field label="Company / project name">
+                <input
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  className="h-11 rounded-xl px-3 outline-none transition focus:border-[#00d68f]/50"
+                  style={fieldStyle()}
+                  required
+                />
+              </Field>
+            </>
           )}
           <Field label="Email">
             <input
@@ -462,7 +479,12 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
       >
         <div>
           <p className="text-xs" style={{ color: "#8b9ab0" }}>Signed in as</p>
-          <p className="font-bold text-white">{user.business_name} · {user.email}</p>
+          <p className="font-bold text-white">
+            {user.name || user.business_name}
+            <span className="ml-2 text-sm font-normal" style={{ color: "#8b9ab0" }}>
+              · {user.business_name} · {user.email}
+            </span>
+          </p>
         </div>
         <button
           type="button"
