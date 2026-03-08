@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -27,6 +27,7 @@ type Job = {
   error_message: string | null;
   mean_asi: number | null;
   num_cases: number | null;
+  completed_cases: number;
 };
 
 type JobListResponse = { jobs: Job[] };
@@ -594,31 +595,81 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
               </tr>
             </thead>
             <tbody>
-              {jobs.map((job) => (
-                <tr key={job.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td className="py-3 pr-4">
-                    <StatusDot status={job.status} />
-                  </td>
-                  <td className="py-3 pr-4 capitalize" style={{ color: "#eef2f7" }}>{job.provider}</td>
-                  <td className="py-3 pr-4 font-mono text-xs" style={{ color: "#eef2f7" }}>{job.model}</td>
-                  <td className="py-3 pr-4 font-bold tabular-nums" style={{ color: job.mean_asi != null ? "#00d68f" : "#8b9ab0" }}>
-                    {job.mean_asi != null ? job.mean_asi.toFixed(2) : "—"}
-                  </td>
-                  <td className="py-3 pr-4" style={{ color: "#8b9ab0" }}>{job.num_cases ?? "—"}</td>
-                  <td className="py-3 pr-4 text-xs" style={{ color: "#8b9ab0" }}>{fmtDate(job.created_at)}</td>
-                  <td className="py-3">
-                    <button
-                      type="button"
-                      onClick={() => void openReport(job.id)}
-                      disabled={job.status !== "completed"}
-                      className="rounded-lg px-3 py-1 text-xs font-medium transition hover:bg-white/5 disabled:opacity-30"
-                      style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#eef2f7" }}
-                    >
-                      View report
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {jobs.map((job) => {
+                const isActive = job.status === "running" || job.status === "queued";
+                const pct = job.status === "running" && job.max_cases > 0
+                  ? Math.min(100, Math.round((job.completed_cases / job.max_cases) * 100))
+                  : 0;
+                return (
+                  <React.Fragment key={job.id}>
+                    <tr style={{ borderBottom: isActive ? undefined : "1px solid rgba(255,255,255,0.04)" }}>
+                      <td className="py-3 pr-4">
+                        <StatusDot status={job.status} />
+                      </td>
+                      <td className="py-3 pr-4 capitalize" style={{ color: "#eef2f7" }}>{job.provider}</td>
+                      <td className="py-3 pr-4 font-mono text-xs" style={{ color: "#eef2f7" }}>{job.model}</td>
+                      <td className="py-3 pr-4 font-bold tabular-nums" style={{ color: job.mean_asi != null ? "#00d68f" : "#8b9ab0" }}>
+                        {job.mean_asi != null ? job.mean_asi.toFixed(2) : "—"}
+                      </td>
+                      <td className="py-3 pr-4 tabular-nums" style={{ color: "#8b9ab0" }}>
+                        {job.status === "running"
+                          ? <span><span style={{ color: "#00d68f" }}>{job.completed_cases}</span> / {job.max_cases}</span>
+                          : (job.num_cases ?? "—")}
+                      </td>
+                      <td className="py-3 pr-4 text-xs" style={{ color: "#8b9ab0" }}>{fmtDate(job.created_at)}</td>
+                      <td className="py-3">
+                        <button
+                          type="button"
+                          onClick={() => void openReport(job.id)}
+                          disabled={job.status !== "completed"}
+                          className="rounded-lg px-3 py-1 text-xs font-medium transition hover:bg-white/5 disabled:opacity-30"
+                          style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#eef2f7" }}
+                        >
+                          View report
+                        </button>
+                      </td>
+                    </tr>
+                    {isActive && (
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                        <td colSpan={7} className="pb-3 pt-0">
+                          {/* Progress bar */}
+                          <div
+                            className="relative overflow-hidden rounded-full"
+                            style={{ height: "6px", background: "rgba(255,255,255,0.06)" }}
+                          >
+                            {job.status === "running" ? (
+                              <div
+                                className="h-full rounded-full transition-all duration-700"
+                                style={{
+                                  width: `${pct}%`,
+                                  background: "linear-gradient(90deg, #00d68f, #00b87a)",
+                                  boxShadow: "0 0 8px #00d68f88",
+                                  minWidth: pct > 0 ? undefined : "0%",
+                                }}
+                              />
+                            ) : (
+                              /* Queued: indeterminate shimmer */
+                              <div
+                                className="absolute inset-y-0 w-1/4 rounded-full"
+                                style={{
+                                  background: "rgba(255,255,255,0.18)",
+                                  animation: "progress-shimmer 1.6s ease-in-out infinite",
+                                }}
+                              />
+                            )}
+                          </div>
+                          {/* Label */}
+                          <p className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+                            {job.status === "running"
+                              ? `${job.completed_cases} of ${job.max_cases} cases complete · ${pct}%`
+                              : "Queued — waiting to start…"}
+                          </p>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
               {jobs.length === 0 && (
                 <tr>
                   <td className="py-8 text-sm" colSpan={7} style={{ color: "#8b9ab0" }}>
