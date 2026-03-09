@@ -18,6 +18,7 @@ type Job = {
   status: "queued" | "running" | "completed" | "failed" | "cancelled";
   provider: string;
   model: string;
+  job_type: "benchmark" | "conversation_benchmark" | "agent_benchmark";
   run_count: number;
   max_cases: number;
   seed: number;
@@ -34,6 +35,25 @@ type Job = {
 type JobListResponse = { jobs: Job[] };
 type JobReportResponse = { job_id: string; report: Record<string, unknown> };
 type AuthMode = "login" | "register";
+type EvaluationMode = "benchmark" | "conversation_benchmark";
+
+const MODE_CONFIG: Record<
+  EvaluationMode,
+  { label: string; description: string; suite: string; maxCasesHint: number }
+> = {
+  benchmark: {
+    label: "Single-turn",
+    description: "Classic ASI benchmark over independent prompts.",
+    suite: "examples/benchmarks/large_suite.json",
+    maxCasesHint: 60,
+  },
+  conversation_benchmark: {
+    label: "Conversation",
+    description: "Multi-turn stability (memory, constraints, consistency, context).",
+    suite: "examples/benchmarks/conversation_suite.json",
+    maxCasesHint: 40,
+  },
+};
 
 function fmtDate(value: string | null): string {
   if (!value) return "—";
@@ -48,6 +68,12 @@ function statusColor(s: Job["status"]) {
   if (s === "failed") return "#ef4444";
   if (s === "cancelled") return "#6b7280";
   return "#8b9ab0";
+}
+
+function jobTypeLabel(jobType: Job["job_type"] | EvaluationMode): string {
+  if (jobType === "conversation_benchmark") return "Conversation";
+  if (jobType === "agent_benchmark") return "Agent";
+  return "Single-turn";
 }
 
 function StatusDot({ status }: { status: Job["status"] }) {
@@ -239,6 +265,7 @@ type AsiStatistics = {
   ci_high?: number;
   std?: number;
   n?: number;
+  sample_size?: number;
 };
 
 // ASI is on a 0–100 scale (see agent_stability_engine/report/schema.py)
@@ -281,8 +308,17 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
     );
   }
 
-  // ASI is 0–100
-  const mean_asi = typeof data.mean_asi === "number" ? data.mean_asi : null;
+  const reportJobType =
+    typeof data.job_type === "string" ? data.job_type : ("benchmark" as const);
+  const isConversation = reportJobType === "conversation_benchmark";
+
+  // ASI/ConvASI is 0–100
+  const mean_asi =
+    typeof data.mean_asi === "number"
+      ? data.mean_asi
+      : typeof data.mean_conv_asi === "number"
+        ? data.mean_conv_asi
+        : null;
   const domain_scores =
     data.domain_scores && typeof data.domain_scores === "object"
       ? (data.domain_scores as Record<string, number>)
@@ -290,11 +326,52 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
   const asi_statistics =
     data.asi_statistics && typeof data.asi_statistics === "object"
       ? (data.asi_statistics as AsiStatistics)
-      : null;
+      : data.conv_asi_statistics && typeof data.conv_asi_statistics === "object"
+        ? (data.conv_asi_statistics as AsiStatistics)
+        : null;
   const num_cases = typeof data.num_cases === "number" ? data.num_cases : null;
   const run_count = typeof data.run_count === "number" ? data.run_count : null;
   const suite_name = typeof data.suite_name === "string" ? data.suite_name : "—";
   const benchmark_id = typeof data.benchmark_id === "string" ? data.benchmark_id : "—";
+  const scoreTitle = isConversation ? "ConvASI score" : "ASI score";
+
+  const conversationCaseAverages = (() => {
+    if (!isConversation) return null;
+    const rawCases = data.cases;
+    if (!Array.isArray(rawCases)) return null;
+
+    const sums: Record<string, number> = {};
+    const counts: Record<string, number> = {};
+    const metricKeys = [
+      "cross_run_variance",
+      "turn_contradiction_rate",
+      "context_failure_rate",
+      "constraint_violation_rate",
+      "drift_rate",
+    ];
+
+    for (const item of rawCases) {
+      if (!item || typeof item !== "object") continue;
+      const report = (item as { report?: unknown }).report;
+      if (!report || typeof report !== "object") continue;
+      const metrics = (report as { metrics?: unknown }).metrics;
+      if (!metrics || typeof metrics !== "object") continue;
+      for (const key of metricKeys) {
+        const value = (metrics as Record<string, unknown>)[key];
+        if (typeof value !== "number") continue;
+        sums[key] = (sums[key] ?? 0) + value;
+        counts[key] = (counts[key] ?? 0) + 1;
+      }
+    }
+
+    const averages: Record<string, number> = {};
+    for (const key of metricKeys) {
+      if ((counts[key] ?? 0) > 0) {
+        averages[key] = sums[key] / counts[key];
+      }
+    }
+    return Object.keys(averages).length > 0 ? averages : null;
+  })();
 
   const color = mean_asi != null ? asiColor(mean_asi) : "#8b9ab0";
   const radius = 54;
@@ -328,7 +405,7 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
               {mean_asi != null ? mean_asi.toFixed(1) : "—"}
             </text>
             <text x="74" y="86" textAnchor="middle" fill="#8b9ab0" fontSize="11" fontFamily="sans-serif">
-              ASI score
+              {scoreTitle}
             </text>
           </svg>
           {mean_asi != null && (
@@ -386,13 +463,37 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
               </div>
               {typeof asi_statistics.std === "number" && (
                 <p className="mt-2 text-xs" style={{ color: "#8b9ab0" }}>
-                  σ&nbsp;=&nbsp;{asi_statistics.std.toFixed(2)}&ensp;·&ensp;n&nbsp;=&nbsp;{asi_statistics.n ?? "—"}
+                  σ&nbsp;=&nbsp;{asi_statistics.std.toFixed(2)}&ensp;·&ensp;n&nbsp;=&nbsp;
+                  {asi_statistics.n ?? asi_statistics.sample_size ?? "—"}
                 </p>
               )}
             </div>
           )}
         </div>
       </div>
+
+      {isConversation && conversationCaseAverages && (
+        <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <h3
+            className="mb-3 text-xs font-semibold uppercase"
+            style={{ color: "#8b9ab0", letterSpacing: "0.05em" }}
+          >
+            Conversation metrics (avg across cases)
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {Object.entries(conversationCaseAverages).map(([key, value]) => (
+              <div key={key} className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.04)" }}>
+                <p className="mb-1 text-[11px] capitalize" style={{ color: "#8b9ab0" }}>
+                  {key.replaceAll("_", " ")}
+                </p>
+                <p className="mono text-sm font-bold" style={{ color: "#eef2f7" }}>
+                  {value.toFixed(3)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Domain breakdown */}
       {Object.keys(domain_scores).length > 0 && (
@@ -431,6 +532,7 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
 // ── Dashboard ────────────────────────────────────────────────────────────────
 
 function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
+  const [jobType, setJobType] = useState<EvaluationMode>("benchmark");
   const [provider, setProvider] = useState<"openai" | "anthropic">("openai");
   const [model, setModel] = useState("gpt-4o-mini");
   const [apiKey, setApiKey] = useState("");
@@ -489,7 +591,17 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: runCount, max_cases: maxCases, seed, workers }),
+        body: JSON.stringify({
+          provider,
+          model,
+          api_key: apiKey,
+          run_count: runCount,
+          max_cases: maxCases,
+          seed,
+          workers,
+          job_type: jobType,
+          suite: MODE_CONFIG[jobType].suite,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -558,6 +670,42 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
       {/* New job form */}
       <div style={cardStyle()}>
         <h2 className="mb-5 text-lg font-bold text-white">Run new evaluation</h2>
+        <div className="mb-5 grid gap-2 md:grid-cols-3">
+          {(Object.keys(MODE_CONFIG) as EvaluationMode[]).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => {
+                setJobType(mode);
+                setMaxCases(MODE_CONFIG[mode].maxCasesHint);
+              }}
+              className="rounded-xl px-4 py-3 text-left transition"
+              style={
+                jobType === mode
+                  ? { background: "rgba(0,214,143,0.12)", border: "1px solid rgba(0,214,143,0.28)" }
+                  : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }
+              }
+            >
+              <p className="text-sm font-bold" style={{ color: jobType === mode ? "#00d68f" : "#eef2f7" }}>
+                {MODE_CONFIG[mode].label}
+              </p>
+              <p className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+                {MODE_CONFIG[mode].description}
+              </p>
+            </button>
+          ))}
+          <div
+            className="rounded-xl px-4 py-3 text-left"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.18)" }}
+          >
+            <p className="text-sm font-bold" style={{ color: "#8b9ab0" }}>
+              Agent (coming next)
+            </p>
+            <p className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+              Tool-call traces and trajectory stability are part of Stage 4+.
+            </p>
+          </div>
+        </div>
         <form onSubmit={submitJob} className="grid gap-4 md:grid-cols-2">
           <Field label="Provider">
             <select
@@ -659,6 +807,11 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
             </button>
             {jobError && <p className="text-sm text-red-400">{jobError}</p>}
           </div>
+          <p className="text-xs md:col-span-2" style={{ color: "#8b9ab0" }}>
+            Mode: <span className="font-semibold" style={{ color: "#eef2f7" }}>{MODE_CONFIG[jobType].label}</span>
+            {" · "}
+            Suite: <span className="mono" style={{ color: "#5b7cf7" }}>{MODE_CONFIG[jobType].suite}</span>
+          </p>
         </form>
       </div>
 
@@ -683,7 +836,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
           <table className="w-full min-w-[600px] text-sm">
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                {["Status", "Provider", "Model", "ASI", "Cases", "Created", ""].map((h) => (
+                {["Status", "Mode", "Provider", "Model", "ASI", "Cases", "Created", ""].map((h) => (
                   <th key={h} className="pb-3 pr-4 text-left text-xs font-medium" style={{ color: "#8b9ab0" }}>
                     {h}
                   </th>
@@ -702,6 +855,9 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
                     <tr style={{ borderBottom: (isActive || isFailed) ? undefined : "1px solid rgba(255,255,255,0.04)" }}>
                       <td className="py-3 pr-4">
                         <StatusDot status={job.status} />
+                      </td>
+                      <td className="py-3 pr-4 text-xs" style={{ color: "#8b9ab0" }}>
+                        {jobTypeLabel(job.job_type)}
                       </td>
                       <td className="py-3 pr-4 capitalize" style={{ color: "#eef2f7" }}>{job.provider}</td>
                       <td className="py-3 pr-4 font-mono text-xs" style={{ color: "#eef2f7" }}>{job.model}</td>
@@ -743,7 +899,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
                     </tr>
                     {isActive && (
                       <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                        <td colSpan={7} className="pb-3 pt-0">
+                        <td colSpan={8} className="pb-3 pt-0">
                           {/* Progress bar */}
                           <div
                             className="relative overflow-hidden rounded-full"
@@ -781,7 +937,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
                     )}
                     {isFailed && job.error_message && (
                       <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                        <td colSpan={7} className="pb-3 pt-0">
+                        <td colSpan={8} className="pb-3 pt-0">
                           <p className="mt-1 rounded-lg px-3 py-2 font-mono text-xs" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.18)", color: "#fca5a5" }}>
                             {job.error_message}
                           </p>
@@ -793,7 +949,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
               })}
               {jobs.length === 0 && (
                 <tr>
-                  <td className="py-8 text-sm" colSpan={7} style={{ color: "#8b9ab0" }}>
+                  <td className="py-8 text-sm" colSpan={8} style={{ color: "#8b9ab0" }}>
                     No evaluations yet. Submit your first one above.
                   </td>
                 </tr>
