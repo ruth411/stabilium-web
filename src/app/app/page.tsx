@@ -437,6 +437,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [runCount, setRunCount] = useState(3);
   const [maxCases, setMaxCases] = useState(20);
   const [seed, setSeed] = useState(42);
+  const [workers, setWorkers] = useState(3);
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedReport, setSelectedReport] = useState<JobReportResponse | null>(null);
@@ -488,7 +489,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: runCount, max_cases: maxCases, seed }),
+        body: JSON.stringify({ provider, model, api_key: apiKey, run_count: runCount, max_cases: maxCases, seed, workers }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -631,6 +632,21 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
               style={fieldStyle()}
               required
             />
+          </Field>
+
+          <Field label="Parallel workers (speed vs rate-limit trade-off)">
+            <select
+              value={workers}
+              onChange={(e) => setWorkers(Number(e.target.value))}
+              className="h-11 rounded-xl px-3 outline-none"
+              style={fieldStyle()}
+            >
+              <option value={1}>1 — sequential (slowest, safest)</option>
+              <option value={2}>2 — 2× faster</option>
+              <option value={3}>3 — 3× faster (recommended)</option>
+              <option value={5}>5 — 5× faster</option>
+              <option value={10}>10 — 10× faster (high API usage)</option>
+            </select>
           </Field>
 
           <div className="flex items-center gap-3 md:col-span-2">
