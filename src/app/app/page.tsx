@@ -35,23 +35,38 @@ type Job = {
 type JobListResponse = { jobs: Job[] };
 type JobReportResponse = { job_id: string; report: Record<string, unknown> };
 type AuthMode = "login" | "register";
-type EvaluationMode = "benchmark" | "conversation_benchmark";
+type EvaluationMode = "benchmark" | "conversation_benchmark" | "agent_benchmark";
 
 const MODE_CONFIG: Record<
   EvaluationMode,
-  { label: string; description: string; suite: string; maxCasesHint: number }
+  {
+    label: string;
+    description: string;
+    suite: string;
+    maxCasesHint: number;
+    faultRateDefault: number;
+  }
 > = {
   benchmark: {
     label: "Single-turn",
     description: "Classic ASI benchmark over independent prompts.",
     suite: "examples/benchmarks/large_suite.json",
     maxCasesHint: 60,
+    faultRateDefault: 0,
   },
   conversation_benchmark: {
     label: "Conversation",
     description: "Multi-turn stability (memory, constraints, consistency, context).",
     suite: "examples/benchmarks/conversation_suite.json",
     maxCasesHint: 40,
+    faultRateDefault: 0,
+  },
+  agent_benchmark: {
+    label: "Agent",
+    description: "Tool-call trajectory stability with fault-injection robustness.",
+    suite: "examples/agent_tasks/sample_tasks.json",
+    maxCasesHint: 20,
+    faultRateDefault: 0.1,
   },
 };
 
@@ -311,14 +326,17 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
   const reportJobType =
     typeof data.job_type === "string" ? data.job_type : ("benchmark" as const);
   const isConversation = reportJobType === "conversation_benchmark";
+  const isAgent = reportJobType === "agent_benchmark";
 
-  // ASI/ConvASI is 0–100
+  // ASI/ConvASI/TraceASI is 0–100
   const mean_asi =
     typeof data.mean_asi === "number"
       ? data.mean_asi
       : typeof data.mean_conv_asi === "number"
         ? data.mean_conv_asi
-        : null;
+        : typeof data.mean_trace_asi === "number"
+          ? data.mean_trace_asi
+          : null;
   const domain_scores =
     data.domain_scores && typeof data.domain_scores === "object"
       ? (data.domain_scores as Record<string, number>)
@@ -328,12 +346,18 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
       ? (data.asi_statistics as AsiStatistics)
       : data.conv_asi_statistics && typeof data.conv_asi_statistics === "object"
         ? (data.conv_asi_statistics as AsiStatistics)
-        : null;
+        : data.trace_asi_statistics && typeof data.trace_asi_statistics === "object"
+          ? (data.trace_asi_statistics as AsiStatistics)
+          : null;
   const num_cases = typeof data.num_cases === "number" ? data.num_cases : null;
   const run_count = typeof data.run_count === "number" ? data.run_count : null;
   const suite_name = typeof data.suite_name === "string" ? data.suite_name : "—";
   const benchmark_id = typeof data.benchmark_id === "string" ? data.benchmark_id : "—";
-  const scoreTitle = isConversation ? "ConvASI score" : "ASI score";
+  const scoreTitle = isConversation
+    ? "ConvASI score"
+    : isAgent
+      ? "TraceASI score"
+      : "ASI score";
 
   const conversationCaseAverages = (() => {
     if (!isConversation) return null;
@@ -366,6 +390,62 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
 
     const averages: Record<string, number> = {};
     for (const key of metricKeys) {
+      if ((counts[key] ?? 0) > 0) {
+        averages[key] = sums[key] / counts[key];
+      }
+    }
+    return Object.keys(averages).length > 0 ? averages : null;
+  })();
+
+  const agentCaseMetrics = (() => {
+    if (!isAgent) return [];
+    const rawCases = data.cases;
+    if (!Array.isArray(rawCases)) return [];
+
+    const rows: Array<{ taskId: string; metrics: Record<string, number> }> = [];
+    for (const item of rawCases) {
+      if (!item || typeof item !== "object") continue;
+      const taskId =
+        typeof (item as { task_id?: unknown }).task_id === "string"
+          ? ((item as { task_id: string }).task_id)
+          : "unknown-task";
+      const report = (item as { report?: unknown }).report;
+      if (!report || typeof report !== "object") continue;
+      const metricsRaw = (report as { metrics?: unknown }).metrics;
+      if (!metricsRaw || typeof metricsRaw !== "object") continue;
+      const metrics: Record<string, number> = {};
+      for (const [k, v] of Object.entries(metricsRaw as Record<string, unknown>)) {
+        if (typeof v === "number") metrics[k] = v;
+      }
+      rows.push({ taskId, metrics });
+    }
+    return rows;
+  })();
+
+  const agentMetricAverages = (() => {
+    if (!isAgent || agentCaseMetrics.length === 0) return null;
+    const keys = [
+      "trajectory_consistency",
+      "tool_selection_accuracy",
+      "step_efficiency",
+      "goal_completion_rate",
+      "parameter_fidelity",
+      "fault_robustness",
+    ] as const;
+
+    const sums: Record<string, number> = {};
+    const counts: Record<string, number> = {};
+    for (const row of agentCaseMetrics) {
+      for (const key of keys) {
+        const value = row.metrics[key];
+        if (typeof value !== "number") continue;
+        sums[key] = (sums[key] ?? 0) + value;
+        counts[key] = (counts[key] ?? 0) + 1;
+      }
+    }
+
+    const averages: Record<string, number> = {};
+    for (const key of keys) {
       if ((counts[key] ?? 0) > 0) {
         averages[key] = sums[key] / counts[key];
       }
@@ -495,6 +575,85 @@ function ReportView({ data }: { data: Record<string, unknown> }) {
         </div>
       )}
 
+      {isAgent && agentMetricAverages && (
+        <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <h3
+            className="mb-3 text-xs font-semibold uppercase"
+            style={{ color: "#8b9ab0", letterSpacing: "0.05em" }}
+          >
+            Trajectory metrics (avg across tasks)
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {Object.entries(agentMetricAverages).map(([key, value]) => (
+              <div key={key} className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.04)" }}>
+                <p className="mb-1 text-[11px] capitalize" style={{ color: "#8b9ab0" }}>
+                  {key.replaceAll("_", " ")}
+                </p>
+                <p className="mono text-sm font-bold" style={{ color: "#eef2f7" }}>
+                  {value.toFixed(3)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {isAgent && agentCaseMetrics.length > 0 && (
+        <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <h3
+            className="mb-3 text-xs font-semibold uppercase"
+            style={{ color: "#8b9ab0", letterSpacing: "0.05em" }}
+          >
+            Task trajectory timeline
+          </h3>
+          <div className="space-y-2">
+            {agentCaseMetrics.map((row) => {
+              const traceAsi = typeof row.metrics.trace_asi === "number" ? row.metrics.trace_asi : 0;
+              const tColor = asiColor(traceAsi);
+              return (
+                <div
+                  key={row.taskId}
+                  className="rounded-lg p-3"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <span className="mono text-xs" style={{ color: "#eef2f7" }}>
+                      {row.taskId}
+                    </span>
+                    <span className="mono text-xs font-bold" style={{ color: tColor }}>
+                      TraceASI {traceAsi.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {[
+                      ["trajectory_consistency", row.metrics.trajectory_consistency],
+                      ["tool_selection_accuracy", row.metrics.tool_selection_accuracy],
+                      ["goal_completion_rate", row.metrics.goal_completion_rate],
+                    ].map(([metric, raw]) => {
+                      const value = typeof raw === "number" ? raw : 0;
+                      return (
+                        <div key={metric}>
+                          <div className="mb-1 flex items-center justify-between text-[11px]" style={{ color: "#8b9ab0" }}>
+                            <span>{String(metric).replaceAll("_", " ")}</span>
+                            <span className="mono">{(value * 100).toFixed(0)}%</span>
+                          </div>
+                          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                            <div
+                              className="h-full rounded-full"
+                              style={{ width: `${Math.max(0, Math.min(100, value * 100))}%`, background: "#5b7cf7" }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Domain breakdown */}
       {Object.keys(domain_scores).length > 0 && (
         <div>
@@ -540,6 +699,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [maxCases, setMaxCases] = useState(20);
   const [seed, setSeed] = useState(42);
   const [workers, setWorkers] = useState(3);
+  const [faultRate, setFaultRate] = useState(0.1);
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedReport, setSelectedReport] = useState<JobReportResponse | null>(null);
@@ -601,6 +761,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
           workers,
           job_type: jobType,
           suite: MODE_CONFIG[jobType].suite,
+          fault_rate: jobType === "agent_benchmark" ? faultRate : 0,
         }),
       });
       const data = await res.json();
@@ -678,6 +839,7 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
               onClick={() => {
                 setJobType(mode);
                 setMaxCases(MODE_CONFIG[mode].maxCasesHint);
+                setFaultRate(MODE_CONFIG[mode].faultRateDefault);
               }}
               className="rounded-xl px-4 py-3 text-left transition"
               style={
@@ -694,17 +856,6 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
               </p>
             </button>
           ))}
-          <div
-            className="rounded-xl px-4 py-3 text-left"
-            style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.18)" }}
-          >
-            <p className="text-sm font-bold" style={{ color: "#8b9ab0" }}>
-              Agent (coming next)
-            </p>
-            <p className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
-              Tool-call traces and trajectory stability are part of Stage 4+.
-            </p>
-          </div>
         </div>
         <form onSubmit={submitJob} className="grid gap-4 md:grid-cols-2">
           <Field label="Provider">
@@ -797,6 +948,26 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
             </select>
           </Field>
 
+          {jobType === "agent_benchmark" && (
+            <Field label="Fault injection rate (0.00–0.50)">
+              <input
+                type="number"
+                min={0}
+                max={0.5}
+                step={0.01}
+                value={faultRate}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  if (Number.isNaN(n)) return;
+                  setFaultRate(Math.max(0, Math.min(0.5, n)));
+                }}
+                className="h-11 rounded-xl px-3 outline-none"
+                style={fieldStyle()}
+                required
+              />
+            </Field>
+          )}
+
           <div className="flex items-center gap-3 md:col-span-2">
             <button
               type="submit"
@@ -811,6 +982,12 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
             Mode: <span className="font-semibold" style={{ color: "#eef2f7" }}>{MODE_CONFIG[jobType].label}</span>
             {" · "}
             Suite: <span className="mono" style={{ color: "#5b7cf7" }}>{MODE_CONFIG[jobType].suite}</span>
+            {jobType === "agent_benchmark" ? (
+              <>
+                {" · "}
+                Fault rate: <span className="mono" style={{ color: "#f59e0b" }}>{faultRate.toFixed(2)}</span>
+              </>
+            ) : null}
           </p>
         </form>
       </div>
@@ -894,6 +1071,15 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
                           >
                             {isFailed ? "View error" : "View report"}
                           </button>
+                          {job.job_type === "agent_benchmark" && (
+                            <Link
+                              href={`/app/jobs/${job.id}/traces`}
+                              className="rounded-lg px-3 py-1 text-xs font-medium transition hover:bg-white/5"
+                              style={{ border: "1px solid rgba(91,124,247,0.35)", color: "#5b7cf7" }}
+                            >
+                              Traces
+                            </Link>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -978,6 +1164,15 @@ function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
               >
                 Download PDF
               </button>
+              {selectedReport.report.job_type === "agent_benchmark" && (
+                <Link
+                  href={`/app/jobs/${selectedReport.job_id}/traces`}
+                  className="rounded-xl px-3 py-1.5 text-xs font-semibold transition hover:bg-white/5"
+                  style={{ border: "1px solid rgba(91,124,247,0.35)", color: "#5b7cf7" }}
+                >
+                  Open traces
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={() => setSelectedReport(null)}
