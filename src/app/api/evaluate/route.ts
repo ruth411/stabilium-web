@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8000";
 
+// 5 live-demo evaluations per IP per 10 minutes
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+
 export async function POST(req: NextRequest) {
+  const ip = clientIp(req);
+  if (!checkRateLimit(`evaluate:${ip}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a few minutes before trying again." },
+      { status: 429 },
+    );
+  }
   let body: unknown;
   try {
     body = await req.json();

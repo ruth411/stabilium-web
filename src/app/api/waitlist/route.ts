@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
+
+// 3 waitlist signups per IP per hour
+const RATE_LIMIT = 3;
+const RATE_WINDOW_MS = 60 * 60 * 1000;
 
 const NOTIFY_EMAIL = "ruthwikdov@gmail.com";
 
 export async function POST(req: NextRequest) {
+  const ip = clientIp(req);
+  if (!checkRateLimit(`waitlist:${ip}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   const resendApiKey = process.env.RESEND_API_KEY;
   if (!resendApiKey) {
     return NextResponse.json({ error: "RESEND_API_KEY is not configured" }, { status: 503 });
