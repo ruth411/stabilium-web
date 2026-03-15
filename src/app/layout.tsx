@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Sora } from "next/font/google";
 import "./globals.css";
+import { WavesBackground } from "@/components/ui/waves-background";
 
 const sora = Sora({
   variable: "--font-sora",
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${sora.variable} ${plexMono.variable} antialiased`}>
+        <WavesBackground />
         {children}
       </body>
     </html>
