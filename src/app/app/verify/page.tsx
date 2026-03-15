@@ -49,13 +49,13 @@ function VerifyPageInner() {
         {status === "verifying" && (
           <>
             <p className="text-lg font-semibold text-white">Verifying your email…</p>
-            <p className="mt-2 text-sm" style={{ color: "#c4cfe0" }}>This will only take a moment.</p>
+            <p className="mt-2 text-sm" style={{ color: "#d4d4d4" }}>This will only take a moment.</p>
           </>
         )}
         {status === "success" && (
           <>
             <p className="text-lg font-semibold" style={{ color: "#00d68f" }}>Email verified!</p>
-            <p className="mt-2 text-sm" style={{ color: "#c4cfe0" }}>Your account is now fully activated.</p>
+            <p className="mt-2 text-sm" style={{ color: "#d4d4d4" }}>Your account is now fully activated.</p>
             <Link
               href="/app"
               className="mt-6 inline-block rounded-xl px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
@@ -68,11 +68,11 @@ function VerifyPageInner() {
         {status === "error" && (
           <>
             <p className="text-lg font-semibold" style={{ color: "#ef4444" }}>Verification failed</p>
-            <p className="mt-2 text-sm" style={{ color: "#c4cfe0" }}>{errorMessage}</p>
+            <p className="mt-2 text-sm" style={{ color: "#d4d4d4" }}>{errorMessage}</p>
             <Link
               href="/app"
               className="mt-6 inline-block rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:bg-white/5"
-              style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#c4cfe0" }}
+              style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#d4d4d4" }}
             >
               Back to app
             </Link>

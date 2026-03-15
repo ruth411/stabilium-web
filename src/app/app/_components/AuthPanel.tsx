@@ -8,7 +8,7 @@ import { cardStyle, fieldStyle } from "../_types";
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span style={{ color: "#c4cfe0" }}>{label}</span>
+      <span style={{ color: "#d4d4d4" }}>{label}</span>
       {children}
     </label>
   );
@@ -79,7 +79,7 @@ export function AuthPanel({
               style={
                 mode === m
                   ? { background: "rgba(0,214,143,0.12)", color: "#00d68f" }
-                  : { color: "#c4cfe0" }
+                  : { color: "#d4d4d4" }
               }
             >
               {m === "login" ? "Sign in" : "Sign up"}
@@ -144,7 +144,7 @@ export function AuthPanel({
           </button>
         </form>
 
-        <p className="mt-5 text-center text-xs" style={{ color: "#c4cfe0" }}>
+        <p className="mt-5 text-center text-xs" style={{ color: "#d4d4d4" }}>
           {mode === "login" ? "No account?" : "Already have one?"}{" "}
           <button
             type="button"
@@ -156,7 +156,7 @@ export function AuthPanel({
         </p>
 
         {mode === "login" && (
-          <p className="mt-2 text-center text-xs" style={{ color: "#c4cfe0" }}>
+          <p className="mt-2 text-center text-xs" style={{ color: "#d4d4d4" }}>
             <Link href="/app/reset-request" className="hover:text-white transition-colors">
               Forgot password?
             </Link>

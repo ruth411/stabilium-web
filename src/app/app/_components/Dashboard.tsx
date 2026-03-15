@@ -145,10 +145,10 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
       {/* User bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl px-5 py-4" style={cardStyle()}>
         <div>
-          <p className="text-xs" style={{ color: "#c4cfe0" }}>Signed in as</p>
+          <p className="text-xs" style={{ color: "#d4d4d4" }}>Signed in as</p>
           <p className="font-bold text-white">
             {user.name || user.business_name}
-            <span className="ml-2 text-sm font-normal" style={{ color: "#c4cfe0" }}>
+            <span className="ml-2 text-sm font-normal" style={{ color: "#d4d4d4" }}>
               · {user.business_name} · {user.email}
             </span>
           </p>
@@ -199,7 +199,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
           <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-bold text-white">
               {selectedReport.report.report_type === "job_failure" ? "Evaluation Error" : "Stability Report"}{" "}
-              <span className="mono text-xs font-normal" style={{ color: "#c4cfe0" }}>
+              <span className="mono text-xs font-normal" style={{ color: "#d4d4d4" }}>
                 {selectedReport.job_id}
               </span>
             </h2>
@@ -225,7 +225,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                 type="button"
                 onClick={() => setSelectedReport(null)}
                 className="rounded-xl px-3 py-1.5 text-xs font-medium transition hover:bg-white/5"
-                style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#c4cfe0" }}
+                style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#d4d4d4" }}
               >
                 Close ✕
               </button>

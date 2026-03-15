@@ -53,7 +53,7 @@ export function JobsTable({ jobs, busy, error, onRefresh, onCancel, onViewReport
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
               {["Status", "Mode", "Provider", "Model", "ASI", "Cases", "Created", ""].map((h) => (
-                <th key={h} className="pb-3 pr-4 text-left text-xs font-medium" style={{ color: "#c4cfe0" }}>
+                <th key={h} className="pb-3 pr-4 text-left text-xs font-medium" style={{ color: "#d4d4d4" }}>
                   {h}
                 </th>
               ))}
@@ -72,13 +72,13 @@ export function JobsTable({ jobs, busy, error, onRefresh, onCancel, onViewReport
                 <React.Fragment key={job.id}>
                   <tr style={{ borderBottom: isActive || isFailed ? undefined : "1px solid rgba(255,255,255,0.04)" }}>
                     <td className="py-3 pr-4"><StatusDot status={job.status} /></td>
-                    <td className="py-3 pr-4 text-xs" style={{ color: "#c4cfe0" }}>{jobTypeLabel(job.job_type)}</td>
+                    <td className="py-3 pr-4 text-xs" style={{ color: "#d4d4d4" }}>{jobTypeLabel(job.job_type)}</td>
                     <td className="py-3 pr-4 capitalize" style={{ color: "#eef2f7" }}>{job.provider}</td>
                     <td className="py-3 pr-4 font-mono text-xs" style={{ color: "#eef2f7" }}>{job.model}</td>
-                    <td className="py-3 pr-4 font-bold tabular-nums" style={{ color: job.mean_asi != null ? "#00d68f" : "#c4cfe0" }}>
+                    <td className="py-3 pr-4 font-bold tabular-nums" style={{ color: job.mean_asi != null ? "#00d68f" : "#d4d4d4" }}>
                       {job.mean_asi != null ? job.mean_asi.toFixed(2) : "—"}
                     </td>
-                    <td className="py-3 pr-4 tabular-nums" style={{ color: "#c4cfe0" }}>
+                    <td className="py-3 pr-4 tabular-nums" style={{ color: "#d4d4d4" }}>
                       {job.status === "running" ? (
                         <span>
                           <span style={{ color: "#00d68f" }}>{job.completed_cases}</span> / {job.max_cases}
@@ -87,7 +87,7 @@ export function JobsTable({ jobs, busy, error, onRefresh, onCancel, onViewReport
                         job.num_cases ?? "—"
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-xs" style={{ color: "#c4cfe0" }}>{fmtDate(job.created_at)}</td>
+                    <td className="py-3 pr-4 text-xs" style={{ color: "#d4d4d4" }}>{fmtDate(job.created_at)}</td>
                     <td className="py-3">
                       <div className="flex items-center gap-2">
                         {isActive && (
@@ -145,7 +145,7 @@ export function JobsTable({ jobs, busy, error, onRefresh, onCancel, onViewReport
                             />
                           )}
                         </div>
-                        <p className="mt-1 text-xs" style={{ color: "#c4cfe0" }}>
+                        <p className="mt-1 text-xs" style={{ color: "#d4d4d4" }}>
                           {job.status === "running"
                             ? `${job.completed_cases} of ${job.max_cases} cases complete · ${pct}%`
                             : "Queued — waiting to start…"}
@@ -172,7 +172,7 @@ export function JobsTable({ jobs, busy, error, onRefresh, onCancel, onViewReport
 
             {jobs.length === 0 && (
               <tr>
-                <td className="py-8 text-sm" colSpan={8} style={{ color: "#c4cfe0" }}>
+                <td className="py-8 text-sm" colSpan={8} style={{ color: "#d4d4d4" }}>
                   No evaluations yet. Submit your first one above.
                 </td>
               </tr>

@@ -114,7 +114,7 @@ export default function JobTracesPage() {
       <div className="mx-auto max-w-6xl px-6 py-8 md:px-10">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.16em]" style={{ color: "#c4cfe0" }}>
+            <p className="text-xs uppercase tracking-[0.16em]" style={{ color: "#d4d4d4" }}>
               Stage 6 · Agent Traces
             </p>
             <h1 className="mt-1 text-2xl font-black text-white">Job traces</h1>
@@ -136,7 +136,7 @@ export default function JobTracesPage() {
             className="rounded-2xl p-6"
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
           >
-            <p style={{ color: "#c4cfe0" }}>Loading traces…</p>
+            <p style={{ color: "#d4d4d4" }}>Loading traces…</p>
           </div>
         )}
 
@@ -158,15 +158,15 @@ export default function JobTracesPage() {
             >
               <div className="grid gap-3 sm:grid-cols-3">
                 <div>
-                  <p className="text-xs" style={{ color: "#c4cfe0" }}>Total traces</p>
+                  <p className="text-xs" style={{ color: "#d4d4d4" }}>Total traces</p>
                   <p className="mono text-lg font-bold text-white">{payload.traces.length}</p>
                 </div>
                 <div>
-                  <p className="text-xs" style={{ color: "#c4cfe0" }}>Tasks</p>
+                  <p className="text-xs" style={{ color: "#d4d4d4" }}>Tasks</p>
                   <p className="mono text-lg font-bold text-white">{grouped.length}</p>
                 </div>
                 <div>
-                  <p className="text-xs" style={{ color: "#c4cfe0" }}>Successful runs</p>
+                  <p className="text-xs" style={{ color: "#d4d4d4" }}>Successful runs</p>
                   <p className="mono text-lg font-bold" style={{ color: "#00d68f" }}>
                     {payload.traces.filter((x) => x.trace.success).length}
                   </p>
@@ -179,7 +179,7 @@ export default function JobTracesPage() {
                 className="rounded-2xl p-6"
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
               >
-                <p style={{ color: "#c4cfe0" }}>No traces stored for this job yet.</p>
+                <p style={{ color: "#d4d4d4" }}>No traces stored for this job yet.</p>
               </div>
             ) : (
               grouped.map(({ taskId, rows }) => (
@@ -200,7 +200,7 @@ export default function JobTracesPage() {
                         >
                           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
-                              <span className="mono text-xs" style={{ color: "#c4cfe0" }}>
+                              <span className="mono text-xs" style={{ color: "#d4d4d4" }}>
                                 run #{row.run_index}
                               </span>
                               <span
@@ -222,14 +222,14 @@ export default function JobTracesPage() {
                                 </span>
                               )}
                             </div>
-                            <div className="mono text-xs" style={{ color: "#c4cfe0" }}>
+                            <div className="mono text-xs" style={{ color: "#d4d4d4" }}>
                               {trace.total_steps} steps · {trace.duration_ms}ms
                             </div>
                           </div>
 
                           <div className="mb-3 flex flex-wrap items-center gap-2">
                             {trace.tool_calls.length === 0 ? (
-                              <span className="text-xs" style={{ color: "#c4cfe0" }}>No tool calls</span>
+                              <span className="text-xs" style={{ color: "#d4d4d4" }}>No tool calls</span>
                             ) : (
                               trace.tool_calls.map((tc, idx) => (
                                 <span
@@ -254,7 +254,7 @@ export default function JobTracesPage() {
                           <details>
                             <summary
                               className="cursor-pointer text-xs font-semibold"
-                              style={{ color: "#c4cfe0" }}
+                              style={{ color: "#d4d4d4" }}
                             >
                               Raw tool call details
                             </summary>
@@ -269,7 +269,7 @@ export default function JobTracesPage() {
                                     {tc.tool_name} · {tc.duration_ms}ms
                                   </p>
                                   <pre style={preStyle()}>{JSON.stringify(tc.arguments, null, 2)}</pre>
-                                  <p className="mt-1 text-xs" style={{ color: "#c4cfe0" }}>
+                                  <p className="mt-1 text-xs" style={{ color: "#d4d4d4" }}>
                                     result: {tc.result ?? "—"}
                                   </p>
                                   {tc.error && (
@@ -283,7 +283,7 @@ export default function JobTracesPage() {
                           </details>
 
                           <div className="mt-3 rounded-lg p-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                            <p className="mb-1 text-xs" style={{ color: "#c4cfe0" }}>Final answer</p>
+                            <p className="mb-1 text-xs" style={{ color: "#d4d4d4" }}>Final answer</p>
                             <p className="text-sm" style={{ color: "#eef2f7" }}>{trace.final_answer ?? "—"}</p>
                           </div>
                         </article>
