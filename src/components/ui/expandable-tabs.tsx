@@ -59,11 +59,16 @@ export function ExpandableTabs({
 
   useOnClickOutside(outsideClickRef as React.RefObject<HTMLElement>, () => {
     setSelected(null);
-    onChange?.(null);
   });
 
-  const handleSelect = (index: number) => {
-    setSelected(index);
+  // Icon click — only expands, no navigation
+  const handleExpand = (index: number) => {
+    setSelected((prev) => (prev === index ? null : index));
+  };
+
+  // Label click — triggers navigation
+  const handleNavigate = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
     onChange?.(index);
   };
 
@@ -92,7 +97,7 @@ export function ExpandableTabs({
             initial={false}
             animate="animate"
             custom={selected === index}
-            onClick={() => handleSelect(index)}
+            onClick={() => handleExpand(index)}
             transition={transition}
             className={cn(
               "relative flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-300",
@@ -110,7 +115,8 @@ export function ExpandableTabs({
                   animate="animate"
                   exit="exit"
                   transition={transition}
-                  className="overflow-hidden"
+                  className="overflow-hidden cursor-pointer hover:underline underline-offset-2"
+                  onClick={(e) => handleNavigate(index, e)}
                 >
                   {tab.title}
                 </motion.span>
