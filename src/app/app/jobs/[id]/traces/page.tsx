@@ -110,7 +110,7 @@ export default function JobTracesPage() {
   }, [payload]);
 
   return (
-    <div className="min-h-screen" style={{ background: "#08090f" }}>
+    <div className="min-h-screen">
       <div className="mx-auto max-w-6xl px-6 py-8 md:px-10">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>

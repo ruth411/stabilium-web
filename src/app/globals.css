@@ -24,7 +24,7 @@
 body {
   min-height: 100vh;
   color: var(--text);
-  background: #08090f;
+  background: var(--background);
   font-family: var(--font-sora), "Avenir Next", "Segoe UI", sans-serif;
 }
 

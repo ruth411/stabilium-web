@@ -218,7 +218,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "#08090f" }}>
+    <div className="min-h-screen">
       {/* Fixed gradient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
         <div
