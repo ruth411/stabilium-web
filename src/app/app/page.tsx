@@ -55,7 +55,7 @@ function AppPageInner() {
           </div>
           <span className="font-bold text-white">Stabilium</span>
         </Link>
-        {user && <p className="text-xs" style={{ color: "#8b9ab0" }}>{user.email}</p>}
+        {user && <p className="text-xs" style={{ color: "#c4cfe0" }}>{user.email}</p>}
       </nav>
 
       <div className="relative z-10">

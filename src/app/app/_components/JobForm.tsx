@@ -25,7 +25,7 @@ type JobFormProps = {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span style={{ color: "#8b9ab0" }}>{label}</span>
+      <span style={{ color: "#c4cfe0" }}>{label}</span>
       {children}
     </label>
   );
@@ -75,7 +75,7 @@ export function JobForm({ busy, error, onSubmit }: JobFormProps) {
             <p className="text-sm font-bold" style={{ color: jobType === mode ? "#00d68f" : "#eef2f7" }}>
               {MODE_CONFIG[mode].label}
             </p>
-            <p className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+            <p className="mt-1 text-xs" style={{ color: "#c4cfe0" }}>
               {MODE_CONFIG[mode].description}
             </p>
           </button>
@@ -188,7 +188,7 @@ export function JobForm({ busy, error, onSubmit }: JobFormProps) {
           {error && <p className="text-sm text-red-400">{error}</p>}
         </div>
 
-        <p className="text-xs md:col-span-2" style={{ color: "#8b9ab0" }}>
+        <p className="text-xs md:col-span-2" style={{ color: "#c4cfe0" }}>
           Mode: <span className="font-semibold" style={{ color: "#eef2f7" }}>{MODE_CONFIG[jobType].label}</span>
           {" · "}
           Suite: <span className="mono" style={{ color: "#5b7cf7" }}>{MODE_CONFIG[jobType].suite}</span>

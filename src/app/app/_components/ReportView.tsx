@@ -39,13 +39,13 @@ function ConversationMetrics({ data }: { data: Record<string, unknown> }) {
 
   return (
     <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-      <h3 className="mb-3 text-xs font-semibold uppercase" style={{ color: "#8b9ab0", letterSpacing: "0.05em" }}>
+      <h3 className="mb-3 text-xs font-semibold uppercase" style={{ color: "#c4cfe0", letterSpacing: "0.05em" }}>
         Conversation metrics (avg across cases)
       </h3>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {Object.entries(averages).map(([key, value]) => (
           <div key={key} className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-            <p className="mb-1 text-[11px] capitalize" style={{ color: "#8b9ab0" }}>{key.replaceAll("_", " ")}</p>
+            <p className="mb-1 text-[11px] capitalize" style={{ color: "#c4cfe0" }}>{key.replaceAll("_", " ")}</p>
             <p className="mono text-sm font-bold" style={{ color: "#eef2f7" }}>{value.toFixed(3)}</p>
           </div>
         ))}
@@ -103,13 +103,13 @@ function AgentMetrics({ data }: { data: Record<string, unknown> }) {
     <>
       {Object.keys(averages).length > 0 && (
         <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <h3 className="mb-3 text-xs font-semibold uppercase" style={{ color: "#8b9ab0", letterSpacing: "0.05em" }}>
+          <h3 className="mb-3 text-xs font-semibold uppercase" style={{ color: "#c4cfe0", letterSpacing: "0.05em" }}>
             Trajectory metrics (avg across tasks)
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Object.entries(averages).map(([key, value]) => (
               <div key={key} className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-                <p className="mb-1 text-[11px] capitalize" style={{ color: "#8b9ab0" }}>{key.replaceAll("_", " ")}</p>
+                <p className="mb-1 text-[11px] capitalize" style={{ color: "#c4cfe0" }}>{key.replaceAll("_", " ")}</p>
                 <p className="mono text-sm font-bold" style={{ color: "#eef2f7" }}>{value.toFixed(3)}</p>
               </div>
             ))}
@@ -118,7 +118,7 @@ function AgentMetrics({ data }: { data: Record<string, unknown> }) {
       )}
 
       <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-        <h3 className="mb-3 text-xs font-semibold uppercase" style={{ color: "#8b9ab0", letterSpacing: "0.05em" }}>
+        <h3 className="mb-3 text-xs font-semibold uppercase" style={{ color: "#c4cfe0", letterSpacing: "0.05em" }}>
           Task trajectory timeline
         </h3>
         <div className="space-y-2">
@@ -142,7 +142,7 @@ function AgentMetrics({ data }: { data: Record<string, unknown> }) {
                     const value = typeof row.metrics[metric] === "number" ? row.metrics[metric] : 0;
                     return (
                       <div key={metric}>
-                        <div className="mb-1 flex items-center justify-between text-[11px]" style={{ color: "#8b9ab0" }}>
+                        <div className="mb-1 flex items-center justify-between text-[11px]" style={{ color: "#c4cfe0" }}>
                           <span>{metric.replaceAll("_", " ")}</span>
                           <span className="mono">{(value * 100).toFixed(0)}%</span>
                         </div>
@@ -180,9 +180,9 @@ export function ReportView({ data }: ReportViewProps) {
           </div>
         </div>
         {completed != null && total != null && (
-          <p className="text-sm" style={{ color: "#8b9ab0" }}>{completed} of {total} cases completed before failure.</p>
+          <p className="text-sm" style={{ color: "#c4cfe0" }}>{completed} of {total} cases completed before failure.</p>
         )}
-        <p className="text-xs" style={{ color: "#8b9ab0" }}>
+        <p className="text-xs" style={{ color: "#c4cfe0" }}>
           Check your API key and model name, then submit a new evaluation.
         </p>
       </div>
@@ -219,7 +219,7 @@ export function ReportView({ data }: ReportViewProps) {
   const benchmark_id = typeof data.benchmark_id === "string" ? data.benchmark_id : "—";
   const scoreTitle = isConversation ? "ConvASI score" : isAgent ? "TraceASI score" : "ASI score";
 
-  const color = mean_asi != null ? asiColor(mean_asi) : "#8b9ab0";
+  const color = mean_asi != null ? asiColor(mean_asi) : "#c4cfe0";
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = mean_asi != null ? circumference * (1 - mean_asi / 100) : circumference;
@@ -245,7 +245,7 @@ export function ReportView({ data }: ReportViewProps) {
             <text x="74" y="68" textAnchor="middle" fill={color} fontSize="28" fontWeight="900" fontFamily="monospace">
               {mean_asi != null ? mean_asi.toFixed(1) : "—"}
             </text>
-            <text x="74" y="86" textAnchor="middle" fill="#8b9ab0" fontSize="11" fontFamily="sans-serif">
+            <text x="74" y="86" textAnchor="middle" fill="#c4cfe0" fontSize="11" fontFamily="sans-serif">
               {scoreTitle}
             </text>
           </svg>
@@ -268,7 +268,7 @@ export function ReportView({ data }: ReportViewProps) {
               { label: "Suite", value: suite_name },
             ].map(({ label, value }) => (
               <div key={label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <p className="mb-1 text-xs" style={{ color: "#8b9ab0" }}>{label}</p>
+                <p className="mb-1 text-xs" style={{ color: "#c4cfe0" }}>{label}</p>
                 <p className="truncate text-sm font-bold text-white">{value}</p>
               </div>
             ))}
@@ -276,7 +276,7 @@ export function ReportView({ data }: ReportViewProps) {
 
           {asi_statistics && typeof asi_statistics.ci_low === "number" && typeof asi_statistics.ci_high === "number" && (
             <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-              <p className="mb-3 text-xs font-medium" style={{ color: "#8b9ab0" }}>95% confidence interval</p>
+              <p className="mb-3 text-xs font-medium" style={{ color: "#c4cfe0" }}>95% confidence interval</p>
               <div className="flex items-center gap-3">
                 <span className="mono w-12 text-right text-sm font-bold" style={{ color }}>
                   {asi_statistics.ci_low.toFixed(1)}
@@ -296,7 +296,7 @@ export function ReportView({ data }: ReportViewProps) {
                 </span>
               </div>
               {typeof asi_statistics.std === "number" && (
-                <p className="mt-2 text-xs" style={{ color: "#8b9ab0" }}>
+                <p className="mt-2 text-xs" style={{ color: "#c4cfe0" }}>
                   σ&nbsp;=&nbsp;{asi_statistics.std.toFixed(2)}&ensp;·&ensp;n&nbsp;=&nbsp;
                   {asi_statistics.n ?? asi_statistics.sample_size ?? "—"}
                 </p>
@@ -311,7 +311,7 @@ export function ReportView({ data }: ReportViewProps) {
 
       {Object.keys(domain_scores).length > 0 && (
         <div>
-          <h3 className="mb-4 text-xs font-semibold uppercase" style={{ color: "#8b9ab0", letterSpacing: "0.05em" }}>
+          <h3 className="mb-4 text-xs font-semibold uppercase" style={{ color: "#c4cfe0", letterSpacing: "0.05em" }}>
             Domain breakdown
           </h3>
           <div className="space-y-3">
@@ -335,7 +335,7 @@ export function ReportView({ data }: ReportViewProps) {
         </div>
       )}
 
-      <p className="border-t pt-4 text-xs" style={{ color: "#8b9ab0", borderColor: "rgba(255,255,255,0.06)" }}>
+      <p className="border-t pt-4 text-xs" style={{ color: "#c4cfe0", borderColor: "rgba(255,255,255,0.06)" }}>
         Benchmark ID &nbsp;<span className="mono" style={{ color: "#5b7cf7" }}>{benchmark_id}</span>
       </p>
     </div>

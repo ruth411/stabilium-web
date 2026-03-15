@@ -41,20 +41,20 @@ export default function ResetRequestPage() {
     <div className="flex min-h-screen items-center justify-center px-6" style={{ background: "#0a0e1a" }}>
       <div className="w-full max-w-sm rounded-2xl p-8" style={cardStyle}>
         <h2 className="mb-2 text-lg font-bold text-white">Forgot your password?</h2>
-        <p className="mb-6 text-sm" style={{ color: "#8b9ab0" }}>
+        <p className="mb-6 text-sm" style={{ color: "#c4cfe0" }}>
           Enter your email and we&apos;ll send you a link to reset your password.
         </p>
 
         {status === "sent" ? (
           <div className="text-center">
             <p className="text-sm font-semibold" style={{ color: "#00d68f" }}>Check your inbox</p>
-            <p className="mt-2 text-sm" style={{ color: "#8b9ab0" }}>
+            <p className="mt-2 text-sm" style={{ color: "#c4cfe0" }}>
               If that email is registered, you&apos;ll receive a reset link shortly.
             </p>
             <Link
               href="/app"
               className="mt-6 inline-block rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:bg-white/5"
-              style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#8b9ab0" }}
+              style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#c4cfe0" }}
             >
               Back to sign in
             </Link>
@@ -62,7 +62,7 @@ export default function ResetRequestPage() {
         ) : (
           <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium" style={{ color: "#8b9ab0" }}>
+              <label className="mb-1.5 block text-xs font-medium" style={{ color: "#c4cfe0" }}>
                 Email address
               </label>
               <input
@@ -86,7 +86,7 @@ export default function ResetRequestPage() {
             >
               {status === "submitting" ? "Sending…" : "Send reset link"}
             </button>
-            <p className="text-center text-xs" style={{ color: "#8b9ab0" }}>
+            <p className="text-center text-xs" style={{ color: "#c4cfe0" }}>
               <Link href="/app" className="hover:text-white transition-colors">Back to sign in</Link>
             </p>
           </form>

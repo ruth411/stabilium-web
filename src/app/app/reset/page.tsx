@@ -61,7 +61,7 @@ function ResetPageInner() {
         {status === "success" ? (
           <div className="text-center">
             <p className="text-sm font-semibold" style={{ color: "#00d68f" }}>Password updated!</p>
-            <p className="mt-2 text-sm" style={{ color: "#8b9ab0" }}>You can now sign in with your new password.</p>
+            <p className="mt-2 text-sm" style={{ color: "#c4cfe0" }}>You can now sign in with your new password.</p>
             <Link
               href="/app"
               className="mt-6 inline-block rounded-xl px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
@@ -73,7 +73,7 @@ function ResetPageInner() {
         ) : (
           <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium" style={{ color: "#8b9ab0" }}>
+              <label className="mb-1.5 block text-xs font-medium" style={{ color: "#c4cfe0" }}>
                 New password
               </label>
               <input
@@ -88,7 +88,7 @@ function ResetPageInner() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium" style={{ color: "#8b9ab0" }}>
+              <label className="mb-1.5 block text-xs font-medium" style={{ color: "#c4cfe0" }}>
                 Confirm password
               </label>
               <input
@@ -115,7 +115,7 @@ function ResetPageInner() {
             >
               {status === "submitting" ? "Updating…" : "Update password"}
             </button>
-            <p className="text-center text-xs" style={{ color: "#8b9ab0" }}>
+            <p className="text-center text-xs" style={{ color: "#c4cfe0" }}>
               <Link href="/app" className="hover:text-white transition-colors">Back to sign in</Link>
             </p>
           </form>

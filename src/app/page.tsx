@@ -139,7 +139,7 @@ function Gauge({ score }: { score: number }) {
         <div className="text-2xl font-black tabular-nums leading-none" style={{ color }}>
           {score.toFixed(1)}
         </div>
-        <div className="mono mt-0.5 text-[9px] uppercase tracking-[0.2em]" style={{ color: "#8b9ab0" }}>
+        <div className="mono mt-0.5 text-[9px] uppercase tracking-[0.2em]" style={{ color: "#c4cfe0" }}>
           ASI
         </div>
       </div>
@@ -156,7 +156,7 @@ function DomainBars({ values }: { values: Record<string, number> }) {
       {entries.map(([domain, score]) => (
         <div key={domain} className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="capitalize" style={{ color: "#8b9ab0" }}>
+            <span className="capitalize" style={{ color: "#c4cfe0" }}>
               {domain}
             </span>
             <span className="mono font-bold" style={{ color: scoreColor(score) }}>
@@ -283,7 +283,7 @@ export default function HomePage() {
           {/* Score */}
           <div className="mt-16 flex flex-col items-center gap-3 animate-fade-up-3">
             <Gauge score={heroScore} />
-            <p className="mono text-xs uppercase tracking-[0.2em]" style={{ color: "#8b9ab0" }}>
+            <p className="mono text-xs uppercase tracking-[0.2em]" style={{ color: "#c4cfe0" }}>
               {result ? `${result.model} · live result` : "sample score"}
             </p>
           </div>
@@ -302,7 +302,7 @@ export default function HomePage() {
                 <div className="text-3xl font-black tabular-nums" style={{ color: "#6366f1" }}>
                   {s.value}
                 </div>
-                <div className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+                <div className="mt-1 text-xs" style={{ color: "#c4cfe0" }}>
                   {s.label}
                 </div>
               </div>
@@ -327,7 +327,7 @@ export default function HomePage() {
                   {f.icon}
                 </div>
                 <h3 className="mb-2 font-bold text-white">{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#8b9ab0" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "#c4cfe0" }}>
                   {f.body}
                 </p>
               </article>
@@ -357,7 +357,7 @@ export default function HomePage() {
                   {step.n}
                 </p>
                 <h3 className="mb-2 text-xl font-bold text-white">{step.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#8b9ab0" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "#c4cfe0" }}>
                   {step.body}
                 </p>
               </article>
@@ -374,7 +374,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
               Run a real benchmark now
             </h2>
-            <p className="mt-3 text-sm" style={{ color: "#8b9ab0" }}>
+            <p className="mt-3 text-sm" style={{ color: "#c4cfe0" }}>
               Free demo runs 10 cases. Sign up for full evaluations up to 100 cases.
             </p>
           </div>
@@ -383,7 +383,7 @@ export default function HomePage() {
             <form onSubmit={runEval} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block text-sm">
-                  <span className="mb-2 block font-medium" style={{ color: "#8b9ab0" }}>
+                  <span className="mb-2 block font-medium" style={{ color: "#c4cfe0" }}>
                     Provider
                   </span>
                   <select
@@ -404,7 +404,7 @@ export default function HomePage() {
                   </select>
                 </label>
                 <label className="block text-sm">
-                  <span className="mb-2 block font-medium" style={{ color: "#8b9ab0" }}>
+                  <span className="mb-2 block font-medium" style={{ color: "#c4cfe0" }}>
                     Model
                   </span>
                   <input
@@ -421,7 +421,7 @@ export default function HomePage() {
               </div>
 
               <label className="block text-sm">
-                <span className="mb-2 block font-medium" style={{ color: "#8b9ab0" }}>
+                <span className="mb-2 block font-medium" style={{ color: "#c4cfe0" }}>
                   API key (one-time, not stored)
                 </span>
                 <input
@@ -440,7 +440,7 @@ export default function HomePage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium" style={{ color: "#8b9ab0" }}>
+                  <span className="font-medium" style={{ color: "#c4cfe0" }}>
                     Number of cases
                   </span>
                   <span className="mono font-bold" style={{ color: "#6366f1" }}>
@@ -455,7 +455,7 @@ export default function HomePage() {
                   onChange={(e) => setMaxCases(Number(e.target.value))}
                   className="w-full cursor-pointer accent-[#6366f1]"
                 />
-                <div className="flex justify-between text-xs" style={{ color: "#8b9ab0" }}>
+                <div className="flex justify-between text-xs" style={{ color: "#c4cfe0" }}>
                   <span>1</span>
                   <span>5</span>
                   <span>10 (max free)</span>
@@ -494,7 +494,7 @@ export default function HomePage() {
                     <div className="flex items-center justify-between gap-4">
                       <div>
                         <p className="font-bold text-white">{result.model}</p>
-                        <p className="mono mt-0.5 text-xs" style={{ color: "#8b9ab0" }}>
+                        <p className="mono mt-0.5 text-xs" style={{ color: "#c4cfe0" }}>
                           {result.num_cases} cases · {result.run_count} runs
                         </p>
                       </div>
@@ -542,7 +542,7 @@ export default function HomePage() {
                   </div>
                 )}
                 <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                <p className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
+                <p className="mt-1 text-xs" style={{ color: "#c4cfe0" }}>
                   {plan.note}
                 </p>
                 <p
@@ -553,7 +553,7 @@ export default function HomePage() {
                 </p>
                 <ul className="mt-6 space-y-2.5">
                   {plan.points.map((pt) => (
-                    <li key={pt} className="flex items-center gap-2 text-sm" style={{ color: "#8b9ab0" }}>
+                    <li key={pt} className="flex items-center gap-2 text-sm" style={{ color: "#c4cfe0" }}>
                       <span style={{ color: "#6366f1" }}>✓</span>
                       {pt}
                     </li>
@@ -591,7 +591,7 @@ export default function HomePage() {
             <h2 className="mb-4 text-4xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
               Ready to certify your AI?
             </h2>
-            <p className="mx-auto mb-10 max-w-xl text-sm leading-relaxed" style={{ color: "#8b9ab0" }}>
+            <p className="mx-auto mb-10 max-w-xl text-sm leading-relaxed" style={{ color: "#c4cfe0" }}>
               Create a free account and run your first benchmark in minutes. No credit card required.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
@@ -629,7 +629,7 @@ export default function HomePage() {
             </div>
             <span className="text-sm font-bold text-white">Stabilium</span>
           </div>
-          <p className="text-xs" style={{ color: "#8b9ab0" }}>
+          <p className="text-xs" style={{ color: "#c4cfe0" }}>
             © {new Date().getFullYear()} Stabilium — AI reliability infrastructure.
           </p>
         </div>
