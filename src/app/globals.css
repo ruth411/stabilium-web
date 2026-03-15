@@ -8,6 +8,15 @@
   --text-muted: #8b9ab0;
   --line: rgba(255, 255, 255, 0.07);
   --surface: rgba(255, 255, 255, 0.03);
+
+  /* shadcn-compatible aliases (used by UI components) */
+  --background: #08090f;
+  --foreground: #eef2f7;
+  --primary: #00d68f;
+  --primary-foreground: #000000;
+  --secondary: rgba(255, 255, 255, 0.08);
+  --muted: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.07);
 }
 
 body {

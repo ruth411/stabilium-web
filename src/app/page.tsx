@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { GlowyWavesHero } from "@/components/ui/glowy-waves-hero";
 
 type EvalResult = {
   model: string;
@@ -270,49 +271,11 @@ export default function HomePage() {
         </div>
       </nav>
 
+      <GlowyWavesHero />
+
       <main className="relative z-10 mx-auto max-w-7xl px-6 md:px-12">
-        {/* ── Hero ── */}
-        <section className="pb-20 pt-24 text-center">
-          <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold mb-8"
-            style={{ border: "1px solid rgba(0,214,143,0.25)", color: "#00d68f", background: "rgba(0,214,143,0.06)" }}>
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
-            Private beta — limited access
-          </div>
-
-          <h1
-            className="animate-fade-up-1 mx-auto max-w-4xl text-5xl font-black leading-[1.05] tracking-tight md:text-7xl"
-            style={{ color: "#eef2f7" }}
-          >
-            Know if your AI is{" "}
-            <span className="gradient-text">reliable enough</span> for
-            production.
-          </h1>
-
-          <p
-            className="animate-fade-up-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed"
-            style={{ color: "#8b9ab0" }}
-          >
-            Stabilium gives engineering and compliance teams a single stability
-            score — with domain-level diagnostics and release-ready evidence —
-            before users feel drift.
-          </p>
-
-          <div className="animate-fade-up-3 mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/app?mode=register"
-              className="btn-primary inline-flex h-12 items-center rounded-xl px-8 text-sm"
-              style={{ boxShadow: "0 0 32px rgba(0,214,143,0.28)" }}
-            >
-              Get started free →
-            </Link>
-            <button
-              onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}
-              className="h-12 rounded-xl border px-8 text-sm font-semibold text-white transition hover:bg-white/5"
-              style={{ border: "1px solid rgba(255,255,255,0.1)" }}
-            >
-              Try live demo
-            </button>
-          </div>
+        {/* ── Hero placeholder (replaced by GlowyWavesHero above) ── */}
+        <section className="hidden">
 
           {/* Score */}
           <div className="mt-16 flex flex-col items-center gap-3 animate-fade-up-3">

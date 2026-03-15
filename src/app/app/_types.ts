@@ -6,6 +6,7 @@ export type User = {
   business_name: string;
   email: string;
   created_at: string;
+  email_verified?: boolean;
 };
 
 export type Job = {

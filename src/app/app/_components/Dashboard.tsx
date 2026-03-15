@@ -22,24 +22,27 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
   const [jobsBusy, setJobsBusy] = useState(false);
   const [jobError, setJobError] = useState<string | null>(null);
   const [jobsError, setJobsError] = useState<string | null>(null);
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendDone, setResendDone] = useState(false);
 
   const hasActive = useMemo(
     () => jobs.some((j) => j.status === "queued" || j.status === "running"),
     [jobs],
   );
 
-  const loadJobs = useCallback(async () => {
+  const loadJobs = useCallback(async (signal?: AbortSignal) => {
     setJobsBusy(true);
     setJobsError(null);
     try {
-      const res = await fetch("/api/jobs");
+      const res = await fetch("/api/jobs", { signal });
       const data = await res.json();
       if (!res.ok) {
         setJobsError((data as { error?: string }).error ?? "Could not load jobs");
         return;
       }
       setJobs((data as JobListResponse).jobs ?? []);
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setJobsError("Could not load jobs");
     } finally {
       setJobsBusy(false);
@@ -47,12 +50,17 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
   }, []);
 
   useEffect(() => {
-    void loadJobs();
+    const controller = new AbortController();
+    void loadJobs(controller.signal);
+    return () => controller.abort();
   }, [loadJobs]);
 
   useEffect(() => {
     const ms = hasActive ? 2500 : 8000;
-    const t = setInterval(() => void loadJobs(), ms);
+    const t = setInterval(() => {
+      const controller = new AbortController();
+      void loadJobs(controller.signal);
+    }, ms);
     return () => clearInterval(t);
   }, [hasActive, loadJobs]);
 
@@ -91,6 +99,20 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
       setJobError("Could not create job");
     } finally {
       setJobBusy(false);
+    }
+  }
+
+  async function resendVerification() {
+    setResendBusy(true);
+    try {
+      await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: user.email }),
+      });
+      setResendDone(true);
+    } finally {
+      setResendBusy(false);
     }
   }
 
@@ -141,13 +163,33 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
         </button>
       </div>
 
+      {!user.email_verified && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl px-5 py-3"
+          style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}
+        >
+          <p className="text-sm" style={{ color: "#f59e0b" }}>
+            Please verify your email address. Check your inbox for a link from Stabilium.
+          </p>
+          <button
+            type="button"
+            onClick={() => void resendVerification()}
+            disabled={resendBusy || resendDone}
+            className="rounded-xl px-3 py-1.5 text-xs font-semibold transition hover:opacity-80 disabled:opacity-50"
+            style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", color: "#f59e0b" }}
+          >
+            {resendDone ? "Email sent ✓" : resendBusy ? "Sending…" : "Resend email"}
+          </button>
+        </div>
+      )}
+
       <JobForm busy={jobBusy} error={jobError} onSubmit={handleJobSubmit} />
 
       <JobsTable
         jobs={jobs}
         busy={jobsBusy}
         error={jobsError}
-        onRefresh={() => void loadJobs()}
+        onRefresh={() => void loadJobs(undefined)}
         onCancel={(id) => void cancelJob(id)}
         onViewReport={(id) => void openReport(id)}
       />

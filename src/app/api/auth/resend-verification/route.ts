@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { AUTH_COOKIE_NAME, BACKEND_URL, extractErrorMessage, parseJsonSafe } from "@/lib/backend";
+import { BACKEND_URL, extractErrorMessage, parseJsonSafe } from "@/lib/backend";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
-const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+const RESEND_RATE_LIMIT = 3;
+const RESEND_RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 async function sendVerificationEmail(toEmail: string, verificationToken: string): Promise<void> {
   const resendApiKey = process.env.RESEND_API_KEY;
-  if (!resendApiKey) return; // graceful degradation — user sees banner to resend
+  if (!resendApiKey) return;
   const resend = new Resend(resendApiKey);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://stabilium.ruthwikdovala.com";
   const link = `${appUrl}/app/verify?token=${encodeURIComponent(verificationToken)}`;
@@ -26,6 +28,11 @@ async function sendVerificationEmail(toEmail: string, verificationToken: string)
 }
 
 export async function POST(req: NextRequest) {
+  const ip = clientIp(req);
+  if (!checkRateLimit(`resend-verification:${ip}`, RESEND_RATE_LIMIT, RESEND_RATE_WINDOW_MS)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -33,7 +40,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const response = await fetch(`${BACKEND_URL}/auth/register`, {
+  const response = await fetch(`${BACKEND_URL}/auth/resend-verification`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
@@ -42,34 +49,18 @@ export async function POST(req: NextRequest) {
 
   if (!response.ok) {
     return NextResponse.json(
-      { error: extractErrorMessage(payload, "Registration failed") },
+      { error: extractErrorMessage(payload, "Could not resend verification email") },
       { status: response.status },
     );
   }
 
-  const p = payload as { token?: unknown; user?: unknown; email_verification_token?: unknown };
-  const token = typeof p.token === "string" ? p.token : undefined;
-  const user = p.user;
-  const emailVerificationToken = typeof p.email_verification_token === "string" ? p.email_verification_token : null;
+  const p = payload as { email_verification_token?: unknown };
+  const verificationToken = typeof p.email_verification_token === "string" ? p.email_verification_token : null;
+  const email = body && typeof body === "object" ? (body as { email?: unknown }).email : undefined;
 
-  if (!token) {
-    return NextResponse.json({ error: "Backend did not return a session token" }, { status: 502 });
+  if (verificationToken && typeof email === "string") {
+    void sendVerificationEmail(email, verificationToken).catch(() => undefined);
   }
 
-  // Send verification email — fire and forget; failure does not block login
-  if (emailVerificationToken && user && typeof user === "object" && "email" in user && typeof (user as { email: unknown }).email === "string") {
-    void sendVerificationEmail((user as { email: string }).email, emailVerificationToken).catch(() => undefined);
-  }
-
-  const out = NextResponse.json({ user });
-  out.cookies.set({
-    name: AUTH_COOKIE_NAME,
-    value: token,
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: COOKIE_MAX_AGE_SECONDS,
-  });
-  return out;
+  return NextResponse.json({ status: "ok" });
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import type { AuthMode, User } from "../_types";
 import { cardStyle, fieldStyle } from "../_types";
@@ -153,6 +154,14 @@ export function AuthPanel({
             {mode === "login" ? "Sign up" : "Sign in"}
           </button>
         </p>
+
+        {mode === "login" && (
+          <p className="mt-2 text-center text-xs" style={{ color: "#8b9ab0" }}>
+            <Link href="/app/reset-request" className="hover:text-white transition-colors">
+              Forgot password?
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

@@ -12,6 +12,12 @@ const store = new Map<string, Bucket>();
  */
 export function checkRateLimit(key: string, limit: number, windowMs: number): boolean {
   const now = Date.now();
+
+  // Prune expired buckets to prevent unbounded memory growth
+  for (const [k, b] of store) {
+    if (now > b.resetAt) store.delete(k);
+  }
+
   const bucket = store.get(key);
 
   if (!bucket || now > bucket.resetAt) {
