@@ -77,7 +77,7 @@ export function fmtDate(value: string | null): string {
 }
 
 export function statusColor(s: Job["status"]): string {
-  if (s === "completed") return "#00d68f";
+  if (s === "completed") return "#6366f1";
   if (s === "running") return "#f59e0b";
   if (s === "failed") return "#ef4444";
   if (s === "cancelled") return "#6b7280";
@@ -100,15 +100,15 @@ export function fieldStyle(): CSSProperties {
 
 export function cardStyle(featured = false): CSSProperties {
   return {
-    background: featured ? "rgba(0,214,143,0.05)" : "rgba(255,255,255,0.03)",
-    border: featured ? "1px solid rgba(0,214,143,0.2)" : "1px solid rgba(255,255,255,0.07)",
+    background: featured ? "rgba(99,102,241,0.05)" : "rgba(255,255,255,0.03)",
+    border: featured ? "1px solid rgba(99,102,241,0.2)" : "1px solid rgba(255,255,255,0.07)",
     borderRadius: "1rem",
     padding: "1.5rem",
   };
 }
 
 export function asiColor(score: number): string {
-  if (score >= 85) return "#00d68f";
+  if (score >= 85) return "#6366f1";
   if (score >= 70) return "#f59e0b";
   return "#ef4444";
 }

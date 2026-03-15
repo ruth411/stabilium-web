@@ -104,7 +104,7 @@ const STATS = [
 ];
 
 function scoreColor(v: number) {
-  if (v >= 85) return "#00d68f";
+  if (v >= 85) return "#6366f1";
   if (v >= 70) return "#f59e0b";
   return "#ef4444";
 }

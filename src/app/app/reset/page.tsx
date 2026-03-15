@@ -60,12 +60,12 @@ function ResetPageInner() {
 
         {status === "success" ? (
           <div className="text-center">
-            <p className="text-sm font-semibold" style={{ color: "#00d68f" }}>Password updated!</p>
+            <p className="text-sm font-semibold" style={{ color: "#6366f1" }}>Password updated!</p>
             <p className="mt-2 text-sm" style={{ color: "#d4d4d4" }}>You can now sign in with your new password.</p>
             <Link
               href="/app"
               className="mt-6 inline-block rounded-xl px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
-              style={{ background: "#00d68f" }}
+              style={{ background: "#6366f1" }}
             >
               Sign in
             </Link>
@@ -111,7 +111,7 @@ function ResetPageInner() {
               type="submit"
               disabled={status === "submitting" || missingToken}
               className="w-full rounded-xl py-2.5 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
-              style={{ background: "#00d68f" }}
+              style={{ background: "#6366f1" }}
             >
               {status === "submitting" ? "Updating…" : "Update password"}
             </button>

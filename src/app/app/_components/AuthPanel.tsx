@@ -78,7 +78,7 @@ export function AuthPanel({
               className="flex-1 py-2.5 text-sm font-semibold capitalize transition"
               style={
                 mode === m
-                  ? { background: "rgba(0,214,143,0.12)", color: "#00d68f" }
+                  ? { background: "rgba(99,102,241,0.12)", color: "#6366f1" }
                   : { color: "#d4d4d4" }
               }
             >
@@ -99,7 +99,7 @@ export function AuthPanel({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jane Smith"
-                  className="h-11 rounded-xl px-3 outline-none transition focus:border-[#00d68f]/50"
+                  className="h-11 rounded-xl px-3 outline-none transition focus:border-[#6366f1]/50"
                   style={fieldStyle()}
                   required
                 />
@@ -108,7 +108,7 @@ export function AuthPanel({
                 <input
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="h-11 rounded-xl px-3 outline-none transition focus:border-[#00d68f]/50"
+                  className="h-11 rounded-xl px-3 outline-none transition focus:border-[#6366f1]/50"
                   style={fieldStyle()}
                   required
                 />
@@ -120,7 +120,7 @@ export function AuthPanel({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 rounded-xl px-3 outline-none transition focus:border-[#00d68f]/50"
+              className="h-11 rounded-xl px-3 outline-none transition focus:border-[#6366f1]/50"
               style={fieldStyle()}
               required
             />
@@ -130,7 +130,7 @@ export function AuthPanel({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 rounded-xl px-3 outline-none transition focus:border-[#00d68f]/50"
+              className="h-11 rounded-xl px-3 outline-none transition focus:border-[#6366f1]/50"
               style={fieldStyle()}
               required
               minLength={8}
@@ -149,7 +149,7 @@ export function AuthPanel({
           <button
             type="button"
             onClick={() => switchMode(mode === "login" ? "register" : "login")}
-            style={{ color: "#00d68f" }}
+            style={{ color: "#6366f1" }}
           >
             {mode === "login" ? "Sign up" : "Sign in"}
           </button>

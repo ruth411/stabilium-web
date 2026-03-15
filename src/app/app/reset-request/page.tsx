@@ -47,7 +47,7 @@ export default function ResetRequestPage() {
 
         {status === "sent" ? (
           <div className="text-center">
-            <p className="text-sm font-semibold" style={{ color: "#00d68f" }}>Check your inbox</p>
+            <p className="text-sm font-semibold" style={{ color: "#6366f1" }}>Check your inbox</p>
             <p className="mt-2 text-sm" style={{ color: "#d4d4d4" }}>
               If that email is registered, you&apos;ll receive a reset link shortly.
             </p>
@@ -82,7 +82,7 @@ export default function ResetRequestPage() {
               type="submit"
               disabled={status === "submitting"}
               className="w-full rounded-xl py-2.5 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
-              style={{ background: "#00d68f" }}
+              style={{ background: "#6366f1" }}
             >
               {status === "submitting" ? "Sending…" : "Send reset link"}
             </button>

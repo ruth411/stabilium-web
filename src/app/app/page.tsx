@@ -33,7 +33,7 @@ function AppPageInner() {
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
         <div
           className="absolute -top-60 -right-60 h-[500px] w-[500px] rounded-full opacity-[0.12] blur-[100px]"
-          style={{ background: "radial-gradient(circle, #00d68f, transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, #6366f1, transparent 70%)" }}
         />
         <div
           className="absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full opacity-[0.1] blur-[90px]"
@@ -57,7 +57,7 @@ function AppPageInner() {
           <div className="flex min-h-[calc(100vh-80px)] items-center justify-center">
             <div
               className="h-8 w-8 animate-spin rounded-full border-2"
-              style={{ borderColor: "rgba(255,255,255,0.1)", borderTopColor: "#00d68f" }}
+              style={{ borderColor: "rgba(255,255,255,0.1)", borderTopColor: "#6366f1" }}
             />
           </div>
         ) : user ? (

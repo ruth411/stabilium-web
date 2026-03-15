@@ -39,7 +39,7 @@ type JobTracesResponse = {
 };
 
 function statusColor(success: boolean): string {
-  return success ? "#00d68f" : "#ef4444";
+  return success ? "#6366f1" : "#ef4444";
 }
 
 function preStyle(): React.CSSProperties {
@@ -167,7 +167,7 @@ export default function JobTracesPage() {
                 </div>
                 <div>
                   <p className="text-xs" style={{ color: "#d4d4d4" }}>Successful runs</p>
-                  <p className="mono text-lg font-bold" style={{ color: "#00d68f" }}>
+                  <p className="mono text-lg font-bold" style={{ color: "#6366f1" }}>
                     {payload.traces.filter((x) => x.trace.success).length}
                   </p>
                 </div>

@@ -68,11 +68,11 @@ export function JobForm({ busy, error, onSubmit }: JobFormProps) {
             className="rounded-xl px-4 py-3 text-left transition"
             style={
               jobType === mode
-                ? { background: "rgba(0,214,143,0.12)", border: "1px solid rgba(0,214,143,0.28)" }
+                ? { background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.28)" }
                 : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)" }
             }
           >
-            <p className="text-sm font-bold" style={{ color: jobType === mode ? "#00d68f" : "#eef2f7" }}>
+            <p className="text-sm font-bold" style={{ color: jobType === mode ? "#6366f1" : "#eef2f7" }}>
               {MODE_CONFIG[mode].label}
             </p>
             <p className="mt-1 text-xs" style={{ color: "#d4d4d4" }}>

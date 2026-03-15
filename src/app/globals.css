@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --brand: #00d68f;
-  --brand-dark: #00a06a;
+  --brand: #6366f1;
+  --brand-dark: #4f46e5;
   --accent: #5b7cf7;
   --text: #eef2f7;
   --text-muted: #d4d4d4;
@@ -153,7 +153,7 @@ body {
 
   /* Keep domain bar colours readable */
   [data-domain-bar] {
-    background: #00a06a !important;
+    background: #4f46e5 !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }

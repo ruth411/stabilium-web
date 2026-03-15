@@ -75,13 +75,13 @@ export function JobsTable({ jobs, busy, error, onRefresh, onCancel, onViewReport
                     <td className="py-3 pr-4 text-xs" style={{ color: "#6b7280" }}>{jobTypeLabel(job.job_type)}</td>
                     <td className="py-3 pr-4 capitalize" style={{ color: "#1f2937" }}>{job.provider}</td>
                     <td className="py-3 pr-4 font-mono text-xs" style={{ color: "#1f2937" }}>{job.model}</td>
-                    <td className="py-3 pr-4 font-bold tabular-nums" style={{ color: job.mean_asi != null ? "#059669" : "#6b7280" }}>
+                    <td className="py-3 pr-4 font-bold tabular-nums" style={{ color: job.mean_asi != null ? "#6366f1" : "#6b7280" }}>
                       {job.mean_asi != null ? job.mean_asi.toFixed(2) : "—"}
                     </td>
                     <td className="py-3 pr-4 tabular-nums" style={{ color: "#374151" }}>
                       {job.status === "running" ? (
                         <span>
-                          <span style={{ color: "#059669" }}>{job.completed_cases}</span> / {job.max_cases}
+                          <span style={{ color: "#6366f1" }}>{job.completed_cases}</span> / {job.max_cases}
                         </span>
                       ) : (
                         job.num_cases ?? "—"
@@ -134,8 +134,8 @@ export function JobsTable({ jobs, busy, error, onRefresh, onCancel, onViewReport
                               className="h-full rounded-full transition-all duration-700"
                               style={{
                                 width: `${pct}%`,
-                                background: "linear-gradient(90deg, #00d68f, #00b87a)",
-                                boxShadow: "0 0 8px #00d68f88",
+                                background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
+                                boxShadow: "0 0 8px #6366f188",
                               }}
                             />
                           ) : (

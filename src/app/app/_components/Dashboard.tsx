@@ -208,7 +208,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                 type="button"
                 onClick={() => window.print()}
                 className="rounded-xl px-3 py-1.5 text-xs font-semibold transition hover:opacity-80"
-                style={{ background: "rgba(0,214,143,0.12)", border: "1px solid rgba(0,214,143,0.3)", color: "#00d68f" }}
+                style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", color: "#6366f1" }}
               >
                 Download PDF
               </button>

@@ -54,12 +54,12 @@ function VerifyPageInner() {
         )}
         {status === "success" && (
           <>
-            <p className="text-lg font-semibold" style={{ color: "#00d68f" }}>Email verified!</p>
+            <p className="text-lg font-semibold" style={{ color: "#6366f1" }}>Email verified!</p>
             <p className="mt-2 text-sm" style={{ color: "#d4d4d4" }}>Your account is now fully activated.</p>
             <Link
               href="/app"
               className="mt-6 inline-block rounded-xl px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
-              style={{ background: "#00d68f" }}
+              style={{ background: "#6366f1" }}
             >
               Go to dashboard
             </Link>

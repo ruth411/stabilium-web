@@ -20,7 +20,7 @@ async function sendVerificationEmail(toEmail: string, verificationToken: string)
       <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
         <h2 style="margin:0 0 8px">Verify your email</h2>
         <p style="color:#555;margin:0 0 24px">Click the link below to verify your email address. This link expires in 24 hours.</p>
-        <a href="${link}" style="display:inline-block;background:#00d68f;color:#000;font-weight:600;padding:12px 24px;border-radius:8px;text-decoration:none">Verify email</a>
+        <a href="${link}" style="display:inline-block;background:#6366f1;color:#000;font-weight:600;padding:12px 24px;border-radius:8px;text-decoration:none">Verify email</a>
         <p style="color:#999;font-size:12px;margin-top:32px">If you didn't create a Stabilium account, you can ignore this email.</p>
       </div>
     `,
