@@ -46,14 +46,8 @@ function AppPageInner() {
         className="relative z-50 flex items-center justify-between px-6 py-4 md:px-10"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
       >
-        <Link href="/" className="flex items-center gap-3">
-          <div
-            className="mono grid h-8 w-8 place-items-center rounded-lg text-xs font-black text-black"
-            style={{ background: "linear-gradient(135deg, #00d68f, #00a06a)" }}
-          >
-            S
-          </div>
-          <span className="font-bold text-white">Stabilium</span>
+        <Link href="/" className="flex items-center">
+          <span className="text-lg font-black tracking-tight text-white">stabilium</span>
         </Link>
         {user && <p className="text-xs" style={{ color: "#c4cfe0" }}>{user.email}</p>}
       </nav>
