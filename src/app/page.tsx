@@ -373,7 +373,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mx-auto max-w-3xl glow-card rounded-2xl p-8">
+          <div className="mx-auto max-w-3xl rounded-2xl p-8" style={{ background: "rgba(8,9,15,0.75)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(16px)" }}>
             <form onSubmit={runEval} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block text-sm">
@@ -389,7 +389,7 @@ export default function HomePage() {
                     }}
                     className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
                     style={{
-                      background: "rgba(255,255,255,0.05)",
+                      background: "rgba(8,9,15,0.6)",
                       border: "1px solid rgba(255,255,255,0.1)",
                     }}
                   >
@@ -406,7 +406,7 @@ export default function HomePage() {
                     onChange={(e) => setModel(e.target.value)}
                     className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
                     style={{
-                      background: "rgba(255,255,255,0.05)",
+                      background: "rgba(8,9,15,0.6)",
                       border: "1px solid rgba(255,255,255,0.1)",
                     }}
                     required
@@ -425,7 +425,7 @@ export default function HomePage() {
                   placeholder="sk-..."
                   className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
+                    background: "rgba(8,9,15,0.6)",
                     border: "1px solid rgba(255,255,255,0.1)",
                   }}
                   required
