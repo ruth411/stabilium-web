@@ -118,7 +118,7 @@ function Gauge({ score }: { score: number }) {
   return (
     <div className="relative inline-flex items-center justify-center">
       <svg width="120" height="120" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
-        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="7" />
         <circle
           cx="50"
           cy="50"
@@ -139,7 +139,7 @@ function Gauge({ score }: { score: number }) {
         <div className="text-2xl font-black tabular-nums leading-none" style={{ color }}>
           {score.toFixed(1)}
         </div>
-        <div className="mono mt-0.5 text-[9px] uppercase tracking-[0.2em]" style={{ color: "#d4d4d4" }}>
+        <div className="mono mt-0.5 text-[9px] uppercase tracking-[0.2em]" style={{ color: "#6b7280" }}>
           ASI
         </div>
       </div>
@@ -156,14 +156,14 @@ function DomainBars({ values }: { values: Record<string, number> }) {
       {entries.map(([domain, score]) => (
         <div key={domain} className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="capitalize" style={{ color: "#d4d4d4" }}>
+            <span className="capitalize" style={{ color: "#4b5563" }}>
               {domain}
             </span>
             <span className="mono font-bold" style={{ color: scoreColor(score) }}>
               {score.toFixed(1)}
             </span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(0,0,0,0.08)" }}>
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
@@ -320,8 +320,8 @@ export default function HomePage() {
                 <div className="mb-4" style={{ color: "#6366f1" }}>
                   {f.icon}
                 </div>
-                <h3 className="mb-2 font-bold text-white">{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#d4d4d4" }}>
+                <h3 className="mb-2 font-bold" style={{ color: "#111827" }}>{f.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#4b5563" }}>
                   {f.body}
                 </p>
               </article>
@@ -343,15 +343,15 @@ export default function HomePage() {
             {STEPS.map((step, i) => (
               <article key={step.n} className="glow-card relative rounded-2xl p-7">
                 {i < STEPS.length - 1 && (
-                  <span className="absolute -right-2 top-8 hidden text-xl lg:block" style={{ color: "rgba(255,255,255,0.15)" }}>
+                  <span className="absolute -right-2 top-8 hidden text-xl lg:block" style={{ color: "rgba(0,0,0,0.2)" }}>
                     →
                   </span>
                 )}
                 <p className="mono mb-4 text-4xl font-black opacity-20" style={{ color: "#6366f1" }}>
                   {step.n}
                 </p>
-                <h3 className="mb-2 text-xl font-bold text-white">{step.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#d4d4d4" }}>
+                <h3 className="mb-2 text-xl font-bold" style={{ color: "#111827" }}>{step.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#4b5563" }}>
                   {step.body}
                 </p>
               </article>
@@ -373,11 +373,11 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mx-auto max-w-3xl rounded-2xl p-8" style={{ background: "rgba(8,9,15,0.75)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(16px)" }}>
+          <div className="mx-auto max-w-3xl rounded-2xl p-8" style={{ background: "rgba(255,255,255,0.97)", border: "1px solid rgba(0,0,0,0.08)", backdropFilter: "blur(16px)" }}>
             <form onSubmit={runEval} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block text-sm">
-                  <span className="mb-2 block font-medium" style={{ color: "#d4d4d4" }}>
+                  <span className="mb-2 block font-medium" style={{ color: "#374151" }}>
                     Provider
                   </span>
                   <select
@@ -387,10 +387,10 @@ export default function HomePage() {
                       setProvider(v);
                       setModel(v === "openai" ? "gpt-4o-mini" : "claude-haiku-4-5");
                     }}
-                    className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
+                    className="h-11 w-full rounded-xl px-3 text-gray-900 outline-none transition"
                     style={{
-                      background: "rgba(8,9,15,0.6)",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "rgba(0,0,0,0.05)",
+                      border: "1px solid rgba(0,0,0,0.12)",
                     }}
                   >
                     <option value="openai">OpenAI</option>
@@ -398,16 +398,16 @@ export default function HomePage() {
                   </select>
                 </label>
                 <label className="block text-sm">
-                  <span className="mb-2 block font-medium" style={{ color: "#d4d4d4" }}>
+                  <span className="mb-2 block font-medium" style={{ color: "#374151" }}>
                     Model
                   </span>
                   <input
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
+                    className="h-11 w-full rounded-xl px-3 text-gray-900 outline-none transition"
                     style={{
-                      background: "rgba(8,9,15,0.6)",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "rgba(0,0,0,0.05)",
+                      border: "1px solid rgba(0,0,0,0.12)",
                     }}
                     required
                   />
@@ -415,7 +415,7 @@ export default function HomePage() {
               </div>
 
               <label className="block text-sm">
-                <span className="mb-2 block font-medium" style={{ color: "#d4d4d4" }}>
+                <span className="mb-2 block font-medium" style={{ color: "#374151" }}>
                   API key (one-time, not stored)
                 </span>
                 <input
@@ -423,10 +423,10 @@ export default function HomePage() {
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="sk-..."
-                  className="h-11 w-full rounded-xl px-3 text-white outline-none transition"
+                  className="h-11 w-full rounded-xl px-3 text-gray-900 outline-none transition"
                   style={{
-                    background: "rgba(8,9,15,0.6)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "rgba(0,0,0,0.05)",
+                    border: "1px solid rgba(0,0,0,0.12)",
                   }}
                   required
                 />
@@ -434,7 +434,7 @@ export default function HomePage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium" style={{ color: "#d4d4d4" }}>
+                  <span className="font-medium" style={{ color: "#374151" }}>
                     Number of cases
                   </span>
                   <span className="mono font-bold" style={{ color: "#6366f1" }}>
@@ -449,7 +449,7 @@ export default function HomePage() {
                   onChange={(e) => setMaxCases(Number(e.target.value))}
                   className="w-full cursor-pointer accent-[#6366f1]"
                 />
-                <div className="flex justify-between text-xs" style={{ color: "#d4d4d4" }}>
+                <div className="flex justify-between text-xs" style={{ color: "#6b7280" }}>
                   <span>1</span>
                   <span>5</span>
                   <span>10 (max free)</span>
@@ -478,17 +478,17 @@ export default function HomePage() {
             {(evalStatus === "error" || result) && (
               <div
                 className="mt-6 rounded-xl p-5"
-                style={{ background: "rgba(8,9,15,0.7)", border: "1px solid rgba(255,255,255,0.06)" }}
+                style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)" }}
               >
                 {evalStatus === "error" && evalError && (
-                  <p className="text-sm text-red-400">{evalError}</p>
+                  <p className="text-sm text-red-500">{evalError}</p>
                 )}
                 {result && (
                   <div className="space-y-5">
                     <div className="flex items-center justify-between gap-4">
                       <div>
-                        <p className="font-bold text-white">{result.model}</p>
-                        <p className="mono mt-0.5 text-xs" style={{ color: "#d4d4d4" }}>
+                        <p className="font-bold" style={{ color: "#111827" }}>{result.model}</p>
+                        <p className="mono mt-0.5 text-xs" style={{ color: "#6b7280" }}>
                           {result.num_cases} cases · {result.run_count} runs
                         </p>
                       </div>
@@ -518,39 +518,34 @@ export default function HomePage() {
                 key={plan.name}
                 className="relative rounded-2xl p-7"
                 style={{
-                  background: plan.featured
-                    ? "rgba(8,9,15,0.8)"
-                    : "rgba(8,9,15,0.7)",
-                  backgroundImage: plan.featured
-                    ? "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.1))"
-                    : undefined,
+                  background: "rgba(255,255,255,0.97)",
                   border: plan.featured
                     ? "1px solid rgba(99,102,241,0.4)"
-                    : "1px solid rgba(255,255,255,0.07)",
-                  boxShadow: plan.featured ? "0 0 48px rgba(99,102,241,0.12)" : undefined,
+                    : "1px solid rgba(0,0,0,0.08)",
+                  boxShadow: plan.featured ? "0 0 48px rgba(99,102,241,0.14)" : undefined,
                 }}
               >
                 {plan.featured && (
                   <div
-                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold text-black"
+                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold text-white"
                     style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}
                   >
                     Most popular
                   </div>
                 )}
-                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                <p className="mt-1 text-xs" style={{ color: "#d4d4d4" }}>
+                <h3 className="text-lg font-bold" style={{ color: "#111827" }}>{plan.name}</h3>
+                <p className="mt-1 text-xs" style={{ color: "#6b7280" }}>
                   {plan.note}
                 </p>
                 <p
                   className="mt-6 text-5xl font-black tracking-tight"
-                  style={{ color: plan.featured ? "#6366f1" : "#eef2f7" }}
+                  style={{ color: plan.featured ? "#6366f1" : "#111827" }}
                 >
                   {plan.price}
                 </p>
                 <ul className="mt-6 space-y-2.5">
                   {plan.points.map((pt) => (
-                    <li key={pt} className="flex items-center gap-2 text-sm" style={{ color: "#d4d4d4" }}>
+                    <li key={pt} className="flex items-center gap-2 text-sm" style={{ color: "#4b5563" }}>
                       <span style={{ color: "#6366f1" }}>✓</span>
                       {pt}
                     </li>
@@ -558,11 +553,11 @@ export default function HomePage() {
                 </ul>
                 <Link
                   href={plan.price === "Custom" ? "mailto:hello@stabilium.io" : "/app?mode=register"}
-                  className={`mt-8 flex h-11 w-full items-center justify-center rounded-xl text-sm font-bold transition ${plan.featured ? "btn-primary" : "text-white hover:bg-white/5"}`}
+                  className={`mt-8 flex h-11 w-full items-center justify-center rounded-xl text-sm font-bold transition ${plan.featured ? "btn-primary" : "hover:bg-black/5"}`}
                   style={
                     plan.featured
                       ? undefined
-                      : { border: "1px solid rgba(255,255,255,0.1)" }
+                      : { border: "1px solid rgba(0,0,0,0.12)", color: "#374151" }
                   }
                 >
                   {plan.price === "Custom" ? "Contact us" : "Get started"}
@@ -602,7 +597,7 @@ export default function HomePage() {
               <Link
                 href="/app"
                 className="inline-flex h-12 items-center rounded-xl px-8 text-sm font-semibold text-white transition hover:bg-white/5"
-                style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+                style={{ border: "1px solid rgba(0,0,0,0.12)" }}
               >
                 Sign in
               </Link>
