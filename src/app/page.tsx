@@ -234,7 +234,7 @@ export default function HomePage() {
       {/* Nav */}
       <nav
         className="relative z-50 flex items-center justify-between px-6 py-4 md:px-12"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(8px)" }}
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", background: "rgba(8,9,15,0.7)" }}
       >
         {/* Logo */}
         <Link href="/" className="flex items-center">
@@ -291,7 +291,7 @@ export default function HomePage() {
               <div
                 key={s.label}
                 className="px-6 py-5 text-center"
-                style={{ background: "rgba(255,255,255,0.03)" }}
+                style={{ background: "rgba(8,9,15,0.7)" }}
               >
                 <div className="text-3xl font-black tabular-nums" style={{ color: "#6366f1" }}>
                   {s.value}
@@ -478,7 +478,7 @@ export default function HomePage() {
             {(evalStatus === "error" || result) && (
               <div
                 className="mt-6 rounded-xl p-5"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                style={{ background: "rgba(8,9,15,0.7)", border: "1px solid rgba(255,255,255,0.06)" }}
               >
                 {evalStatus === "error" && evalError && (
                   <p className="text-sm text-red-400">{evalError}</p>
@@ -519,8 +519,11 @@ export default function HomePage() {
                 className="relative rounded-2xl p-7"
                 style={{
                   background: plan.featured
-                    ? "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.06))"
-                    : "rgba(255,255,255,0.03)",
+                    ? "rgba(8,9,15,0.8)"
+                    : "rgba(8,9,15,0.7)",
+                  backgroundImage: plan.featured
+                    ? "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.1))"
+                    : undefined,
                   border: plan.featured
                     ? "1px solid rgba(99,102,241,0.4)"
                     : "1px solid rgba(255,255,255,0.07)",
@@ -611,7 +614,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer
         className="relative z-10 px-6 py-8 md:px-12"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+        style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "rgba(8,9,15,0.7)", backdropFilter: "blur(20px)" }}
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center">

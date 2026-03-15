@@ -86,9 +86,9 @@ body {
 }
 
 .glow-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  backdrop-filter: blur(12px);
+  background: rgba(8, 9, 15, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
   transition: border-color 0.2s;
 }
 
