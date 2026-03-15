@@ -237,9 +237,9 @@ export default function HomePage() {
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(8px)" }}
       >
         {/* Logo */}
-        <div className="flex items-center">
+        <Link href="/" className="flex items-center">
           <span className="text-lg font-black tracking-tight text-white">stabilium.</span>
-        </div>
+        </Link>
 
         {/* Expandable tabs — center */}
         <div className="hidden md:block">
