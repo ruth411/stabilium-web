@@ -44,7 +44,7 @@ function AppPageInner() {
       {/* Nav */}
       <nav
         className="relative z-50 flex items-center justify-between px-6 py-4 md:px-10"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(8,9,15,0.7)", backdropFilter: "blur(20px)" }}
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "transparent", backdropFilter: "blur(20px)" }}
       >
         <Link href="/" className="flex items-center">
           <span className="text-lg font-black tracking-tight text-white">stabilium.</span>

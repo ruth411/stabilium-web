@@ -234,7 +234,7 @@ export default function HomePage() {
       {/* Nav */}
       <nav
         className="relative z-50 flex items-center justify-between px-6 py-4 md:px-12"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", background: "rgba(8,9,15,0.7)" }}
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", background: "transparent" }}
       >
         {/* Logo */}
         <Link href="/" className="flex items-center">
