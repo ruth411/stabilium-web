@@ -115,7 +115,7 @@ export function ExpandableTabs({
                   animate="animate"
                   exit="exit"
                   transition={transition}
-                  className="overflow-hidden cursor-pointer hover:underline underline-offset-2"
+                  className="overflow-hidden whitespace-nowrap cursor-pointer hover:underline underline-offset-2"
                   onClick={(e) => handleNavigate(index, e)}
                 >
                   {tab.title}
