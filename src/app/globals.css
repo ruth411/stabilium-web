@@ -79,7 +79,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #00d68f 30%, #5b7cf7);
+  background: linear-gradient(135deg, #6366f1 30%, #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -93,12 +93,12 @@ body {
 }
 
 .glow-card:hover {
-  border-color: rgba(0, 214, 143, 0.25);
+  border-color: rgba(99, 102, 241, 0.35);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #00d68f, #00b87a);
-  color: #000;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
   font-weight: 700;
   transition: opacity 0.15s, transform 0.15s;
 }

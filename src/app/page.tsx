@@ -222,8 +222,8 @@ export default function HomePage() {
       {/* Fixed gradient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
         <div
-          className="absolute -top-60 -right-60 h-[700px] w-[700px] rounded-full opacity-[0.18] blur-[130px]"
-          style={{ background: "radial-gradient(circle, #00d68f, transparent 70%)" }}
+          className="absolute -top-60 -right-60 h-[700px] w-[700px] rounded-full opacity-[0.12] blur-[130px]"
+          style={{ background: "radial-gradient(circle, #6366f1, transparent 70%)" }}
         />
         <div
           className="absolute -bottom-60 -left-60 h-[600px] w-[600px] rounded-full opacity-[0.14] blur-[110px]"
@@ -299,7 +299,7 @@ export default function HomePage() {
                 className="px-6 py-5 text-center"
                 style={{ background: "rgba(255,255,255,0.03)" }}
               >
-                <div className="text-3xl font-black tabular-nums" style={{ color: "#00d68f" }}>
+                <div className="text-3xl font-black tabular-nums" style={{ color: "#6366f1" }}>
                   {s.value}
                 </div>
                 <div className="mt-1 text-xs" style={{ color: "#8b9ab0" }}>
@@ -313,7 +313,7 @@ export default function HomePage() {
         {/* ── Features ── */}
         <section id="features" className="py-16">
           <div className="mb-12 text-center">
-            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#6366f1" }}>
               Capabilities
             </p>
             <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
@@ -323,7 +323,7 @@ export default function HomePage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
               <article key={f.title} className="glow-card rounded-2xl p-6">
-                <div className="mb-4" style={{ color: "#00d68f" }}>
+                <div className="mb-4" style={{ color: "#6366f1" }}>
                   {f.icon}
                 </div>
                 <h3 className="mb-2 font-bold text-white">{f.title}</h3>
@@ -338,7 +338,7 @@ export default function HomePage() {
         {/* ── How it works ── */}
         <section className="py-16">
           <div className="mb-12 text-center">
-            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#6366f1" }}>
               Process
             </p>
             <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
@@ -353,7 +353,7 @@ export default function HomePage() {
                     →
                   </span>
                 )}
-                <p className="mono mb-4 text-4xl font-black opacity-20" style={{ color: "#00d68f" }}>
+                <p className="mono mb-4 text-4xl font-black opacity-20" style={{ color: "#6366f1" }}>
                   {step.n}
                 </p>
                 <h3 className="mb-2 text-xl font-bold text-white">{step.title}</h3>
@@ -368,7 +368,7 @@ export default function HomePage() {
         {/* ── Live Demo ── */}
         <section id="demo" className="py-16">
           <div className="mb-12 text-center">
-            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#6366f1" }}>
               Live demo
             </p>
             <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
@@ -443,7 +443,7 @@ export default function HomePage() {
                   <span className="font-medium" style={{ color: "#8b9ab0" }}>
                     Number of cases
                   </span>
-                  <span className="mono font-bold" style={{ color: "#00d68f" }}>
+                  <span className="mono font-bold" style={{ color: "#6366f1" }}>
                     {maxCases}
                   </span>
                 </div>
@@ -453,7 +453,7 @@ export default function HomePage() {
                   max={10}
                   value={maxCases}
                   onChange={(e) => setMaxCases(Number(e.target.value))}
-                  className="w-full cursor-pointer accent-[#00d68f]"
+                  className="w-full cursor-pointer accent-[#6366f1]"
                 />
                 <div className="flex justify-between text-xs" style={{ color: "#8b9ab0" }}>
                   <span>1</span>
@@ -511,7 +511,7 @@ export default function HomePage() {
         {/* ── Pricing ── */}
         <section id="pricing" className="py-16">
           <div className="mb-12 text-center">
-            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+            <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#6366f1" }}>
               Pricing
             </p>
             <h2 className="text-3xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
@@ -525,18 +525,18 @@ export default function HomePage() {
                 className="relative rounded-2xl p-7"
                 style={{
                   background: plan.featured
-                    ? "linear-gradient(135deg, rgba(0,214,143,0.09), rgba(0,214,143,0.03))"
+                    ? "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.06))"
                     : "rgba(255,255,255,0.03)",
                   border: plan.featured
-                    ? "1px solid rgba(0,214,143,0.35)"
+                    ? "1px solid rgba(99,102,241,0.4)"
                     : "1px solid rgba(255,255,255,0.07)",
-                  boxShadow: plan.featured ? "0 0 48px rgba(0,214,143,0.1)" : undefined,
+                  boxShadow: plan.featured ? "0 0 48px rgba(99,102,241,0.12)" : undefined,
                 }}
               >
                 {plan.featured && (
                   <div
                     className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold text-black"
-                    style={{ background: "linear-gradient(135deg, #00d68f, #00b87a)" }}
+                    style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}
                   >
                     Most popular
                   </div>
@@ -547,14 +547,14 @@ export default function HomePage() {
                 </p>
                 <p
                   className="mt-6 text-5xl font-black tracking-tight"
-                  style={{ color: plan.featured ? "#00d68f" : "#eef2f7" }}
+                  style={{ color: plan.featured ? "#6366f1" : "#eef2f7" }}
                 >
                   {plan.price}
                 </p>
                 <ul className="mt-6 space-y-2.5">
                   {plan.points.map((pt) => (
                     <li key={pt} className="flex items-center gap-2 text-sm" style={{ color: "#8b9ab0" }}>
-                      <span style={{ color: "#00d68f" }}>✓</span>
+                      <span style={{ color: "#6366f1" }}>✓</span>
                       {pt}
                     </li>
                   ))}
@@ -580,12 +580,12 @@ export default function HomePage() {
           <div
             className="rounded-3xl p-10 text-center md:p-16"
             style={{
-              background: "linear-gradient(135deg, rgba(0,214,143,0.07), rgba(91,124,247,0.06))",
-              border: "1px solid rgba(0,214,143,0.15)",
-              boxShadow: "0 0 80px rgba(0,214,143,0.07)",
+              background: "linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05))",
+              border: "1px solid rgba(99,102,241,0.2)",
+              boxShadow: "0 0 80px rgba(99,102,241,0.08)",
             }}
           >
-            <p className="mono mb-4 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
+            <p className="mono mb-4 text-xs uppercase tracking-[0.2em]" style={{ color: "#6366f1" }}>
               Start today
             </p>
             <h2 className="mb-4 text-4xl font-black tracking-tight" style={{ color: "#eef2f7" }}>
@@ -598,7 +598,7 @@ export default function HomePage() {
               <Link
                 href="/app?mode=register"
                 className="btn-primary inline-flex h-12 items-center rounded-xl px-10 text-sm"
-                style={{ boxShadow: "0 0 32px rgba(0,214,143,0.25)" }}
+                style={{ boxShadow: "0 0 32px rgba(99,102,241,0.25)" }}
               >
                 Create free account →
               </Link>
