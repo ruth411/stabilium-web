@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { GlowyWavesHero } from "@/components/ui/glowy-waves-hero";
+import { ExpandableTabs } from "@/components/ui/expandable-tabs";
+import { BarChart2, FlaskConical, DollarSign, LogIn } from "lucide-react";
 
 type EvalResult = {
   model: string;
@@ -234,6 +236,7 @@ export default function HomePage() {
         className="relative z-50 flex items-center justify-between px-6 py-4 md:px-12"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(8px)" }}
       >
+        {/* Logo */}
         <div className="flex items-center gap-3">
           <div
             className="mono grid h-8 w-8 place-items-center rounded-lg text-xs font-black text-black"
@@ -243,32 +246,32 @@ export default function HomePage() {
           </div>
           <span className="font-bold tracking-tight text-white">Stabilium</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}
-            className="hidden px-3 py-2 text-sm transition hover:text-white sm:block"
-            style={{ color: "#8b9ab0" }}
-          >
-            Live demo
-          </button>
-          <button
-            onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
-            className="hidden px-3 py-2 text-sm transition hover:text-white sm:block"
-            style={{ color: "#8b9ab0" }}
-          >
-            Pricing
-          </button>
-          <Link
-            href="/app"
-            className="hidden px-3 py-2 text-sm transition hover:text-white sm:block"
-            style={{ color: "#8b9ab0" }}
-          >
-            Sign in
-          </Link>
-          <Link href="/app?mode=register" className="btn-primary rounded-lg px-4 py-2 text-sm">
-            Get started
-          </Link>
+
+        {/* Expandable tabs — center */}
+        <div className="hidden md:block">
+          <ExpandableTabs
+            activeColor="text-primary"
+            className="border-white/10 bg-white/5"
+            tabs={[
+              { title: "Live demo", icon: FlaskConical },
+              { title: "Features", icon: BarChart2 },
+              { type: "separator" },
+              { title: "Pricing", icon: DollarSign },
+              { title: "Sign in", icon: LogIn },
+            ]}
+            onChange={(i) => {
+              if (i === 0) document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" });
+              if (i === 1) document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+              if (i === 3) document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+              if (i === 4) window.location.href = "/app";
+            }}
+          />
         </div>
+
+        {/* CTA */}
+        <Link href="/app?mode=register" className="btn-primary rounded-lg px-4 py-2 text-sm">
+          Get started
+        </Link>
       </nav>
 
       <GlowyWavesHero />
@@ -308,7 +311,7 @@ export default function HomePage() {
         </section>
 
         {/* ── Features ── */}
-        <section className="py-16">
+        <section id="features" className="py-16">
           <div className="mb-12 text-center">
             <p className="mono mb-3 text-xs uppercase tracking-[0.2em]" style={{ color: "#00d68f" }}>
               Capabilities
