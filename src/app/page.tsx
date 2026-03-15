@@ -238,7 +238,7 @@ export default function HomePage() {
       >
         {/* Logo */}
         <div className="flex items-center">
-          <span className="text-lg font-black tracking-tight text-white">stabilium</span>
+          <span className="text-lg font-black tracking-tight text-white">stabilium.</span>
         </div>
 
         {/* Expandable tabs — center */}
@@ -615,7 +615,7 @@ export default function HomePage() {
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center">
-            <span className="text-sm font-black tracking-tight text-white">stabilium</span>
+            <span className="text-sm font-black tracking-tight text-white">stabilium.</span>
           </div>
           <p className="text-xs" style={{ color: "#c4cfe0" }}>
             © {new Date().getFullYear()} Stabilium — AI reliability infrastructure.

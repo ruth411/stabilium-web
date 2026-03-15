@@ -47,7 +47,7 @@ function AppPageInner() {
         style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
       >
         <Link href="/" className="flex items-center">
-          <span className="text-lg font-black tracking-tight text-white">stabilium</span>
+          <span className="text-lg font-black tracking-tight text-white">stabilium.</span>
         </Link>
         {user && <p className="text-xs" style={{ color: "#c4cfe0" }}>{user.email}</p>}
       </nav>
