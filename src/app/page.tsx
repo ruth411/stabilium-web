@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { GlowyWavesHero } from "@/components/ui/glowy-waves-hero";
 import { ExpandableTabs } from "@/components/ui/expandable-tabs";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 import { BarChart2, FlaskConical, DollarSign, LogIn } from "lucide-react";
 
 type EvalResult = {
@@ -263,8 +264,10 @@ export default function HomePage() {
         </div>
 
         {/* CTA */}
-        <Link href="/app?mode=register" className="btn-primary rounded-lg px-4 py-2 text-sm">
-          Get started
+        <Link href="/app?mode=register">
+          <RainbowButton className="px-5 py-2 text-sm">
+            Get started
+          </RainbowButton>
         </Link>
       </nav>
 
